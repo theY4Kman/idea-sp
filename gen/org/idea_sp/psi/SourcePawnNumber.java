@@ -1,0 +1,22 @@
+// This is a generated file. Not intended for manual editing.
+package org.idea_sp.psi;
+
+import java.util.List;
+import org.jetbrains.annotations.*;
+import com.intellij.psi.PsiElement;
+
+public interface SourcePawnNumber extends PsiElement {
+
+  @Nullable
+  PsiElement getBinaryLiteral();
+
+  @Nullable
+  PsiElement getFloatLiteral();
+
+  @Nullable
+  PsiElement getHexLiteral();
+
+  @Nullable
+  PsiElement getIntegerLiteral();
+
+}
