@@ -22,104 +22,86 @@ public class SourcePawnParser implements PsiParser {
     boolean r;
     b = adapt_builder_(t, b, this, null);
     Marker m = enter_section_(b, 0, _COLLAPSE_, null);
-    if (t == ASSIGN_OP) {
-      r = ASSIGN_OP(b, 0);
+    if (t == ARG_INIT) {
+      r = arg_init(b, 0);
     }
-    else if (t == AUGMENTED_ASSIGN_OP) {
-      r = AUGMENTED_ASSIGN_OP(b, 0);
+    else if (t == ARG_NEW) {
+      r = arg_new(b, 0);
     }
-    else if (t == ANY_ASSIGN_OP) {
-      r = any_assign_op(b, 0);
+    else if (t == ARG_OLD) {
+      r = arg_old(b, 0);
     }
-    else if (t == ARGDEF) {
-      r = argdef(b, 0);
+    else if (t == ARGDECL) {
+      r = argdecl(b, 0);
     }
-    else if (t == ARGDEF_DEFAULT) {
-      r = argdef_default(b, 0);
+    else if (t == BUILTIN_TYPE) {
+      r = builtin_type(b, 0);
     }
-    else if (t == ARRAY_DIMS) {
-      r = array_dims(b, 0);
+    else if (t == GLOBAL) {
+      r = global(b, 0);
     }
-    else if (t == ASSIGN_EXPR) {
-      r = assign_expr(b, 0);
+    else if (t == GLOBAL_ASSN) {
+      r = global_assn(b, 0);
     }
-    else if (t == BLOCK_STATEMENT) {
-      r = block_statement(b, 0);
+    else if (t == GLOBAL_NEW) {
+      r = global_new(b, 0);
     }
-    else if (t == COMPLEX_EXPRESSION) {
-      r = complex_expression(b, 0);
+    else if (t == GLOBAL_OLD) {
+      r = global_old(b, 0);
     }
-    else if (t == DECL_EXPR) {
-      r = decl_expr(b, 0);
-    }
-    else if (t == ENUM_DECLARATION) {
-      r = enum_declaration(b, 0);
-    }
-    else if (t == ENUM_DECLARATION_LIST) {
-      r = enum_declaration_list(b, 0);
-    }
-    else if (t == ENUM_DECLARATION_LIST_ITEM) {
-      r = enum_declaration_list_item(b, 0);
-    }
-    else if (t == EXPRESSION) {
-      r = expression(b, 0);
-    }
-    else if (t == FORWARD_DECLARATION) {
-      r = forward_declaration(b, 0);
-    }
-    else if (t == FUNC_PROTO) {
-      r = func_proto(b, 0);
-    }
-    else if (t == GLOBAL_DECLARATION) {
-      r = global_declaration(b, 0);
-    }
-    else if (t == GLOBAL_STORAGE_TYPE) {
-      r = global_storage_type(b, 0);
-    }
-    else if (t == INITIALIZER) {
-      r = initializer(b, 0);
+    else if (t == LABEL) {
+      r = label(b, 0);
     }
     else if (t == LITERAL) {
       r = literal(b, 0);
     }
-    else if (t == LOCAL_STORAGE_TYPE) {
-      r = local_storage_type(b, 0);
-    }
-    else if (t == NATIVE_DECLARATION) {
-      r = native_declaration(b, 0);
-    }
-    else if (t == NEW_EXPR) {
-      r = new_expr(b, 0);
+    else if (t == NEW_DIMS) {
+      r = new_dims(b, 0);
     }
     else if (t == NUMBER) {
       r = number(b, 0);
     }
-    else if (t == SIMPLE_EXPRESSION) {
-      r = simple_expression(b, 0);
+    else if (t == OLD_DIMS) {
+      r = old_dims(b, 0);
     }
-    else if (t == SINGLE_STATEMENT) {
-      r = single_statement(b, 0);
+    else if (t == RETURN_NEW) {
+      r = return_new(b, 0);
     }
-    else if (t == STATEMENT) {
-      r = statement(b, 0);
+    else if (t == RETURN_OLD) {
+      r = return_old(b, 0);
     }
-    else if (t == STRUCT_INITIALIZER) {
-      r = struct_initializer(b, 0);
+    else if (t == RETURN_TYPE) {
+      r = return_type(b, 0);
     }
-    else if (t == STRUCT_INITIALIZER_ITEM) {
-      r = struct_initializer_item(b, 0);
+    else if (t == STORAGE_CLASS) {
+      r = storage_class(b, 0);
     }
     else if (t == TAG) {
       r = tag(b, 0);
     }
-    else if (t == TAGGED_IDENTIFIER) {
-      r = tagged_identifier(b, 0);
+    else if (t == TAG_VECTOR) {
+      r = tag_vector(b, 0);
     }
-    else if (t == TOP_LEVEL_STATEMENT) {
-      r = top_level_statement(b, 0);
+    else if (t == TAGS) {
+      r = tags(b, 0);
     }
-    else if (t == TOP_LEVEL_STATEMENT_ITEM) {
-      r = top_level_statement_item(b, 0);
+    else if (t == TYPE_EXPR) {
+      r = type_expr(b, 0);
+    }
+    else if (t == VAR_NEW) {
+      r = var_new(b, 0);
+    }
+    else if (t == VAR_NEW_PREFIX) {
+      r = var_new_prefix(b, 0);
+    }
+    else if (t == VAR_OLD) {
+      r = var_old(b, 0);
+    }
+    else if (t == VAR_OLD_PREFIX) {
+      r = var_old_prefix(b, 0);
+    }
+    else if (t == VARDECL) {
+      r = vardecl(b, 0);
     }
     else {
       r = parse_root_(t, b, 0);
@@ -132,556 +114,419 @@ public class SourcePawnParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // EQ
-  public static boolean ASSIGN_OP(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "ASSIGN_OP")) return false;
-    if (!nextTokenIs(b, EQ)) return false;
+  // literal | symbol
+  public static boolean arg_init(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "arg_init")) return false;
     boolean r;
-    Marker m = enter_section_(b);
-    r = consumeToken(b, EQ);
-    exit_section_(b, m, ASSIGN_OP, r);
+    Marker m = enter_section_(b, l, _NONE_, "<arg init>");
+    r = literal(b, l + 1);
+    if (!r) r = consumeToken(b, SYMBOL);
+    exit_section_(b, l, m, ARG_INIT, r, false, null);
     return r;
   }
 
   /* ********************************************************** */
-  // PLUSEQ
-  //   | MINUSEQ
-  //   | ASTERISKEQ
-  //   | DIVEQ
-  //   | ANDEQ
-  public static boolean AUGMENTED_ASSIGN_OP(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "AUGMENTED_ASSIGN_OP")) return false;
+  // "const"? type_expr '&'? symbol old_dims? ('=' arg_init)?
+  public static boolean arg_new(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "arg_new")) return false;
     boolean r;
-    Marker m = enter_section_(b, l, _NONE_, "<augmented assign op>");
-    r = consumeToken(b, PLUSEQ);
-    if (!r) r = consumeToken(b, MINUSEQ);
-    if (!r) r = consumeToken(b, ASTERISKEQ);
-    if (!r) r = consumeToken(b, DIVEQ);
-    if (!r) r = consumeToken(b, ANDEQ);
-    exit_section_(b, l, m, AUGMENTED_ASSIGN_OP, r, false, null);
+    Marker m = enter_section_(b, l, _NONE_, "<arg new>");
+    r = arg_new_0(b, l + 1);
+    r = r && type_expr(b, l + 1);
+    r = r && arg_new_2(b, l + 1);
+    r = r && consumeToken(b, SYMBOL);
+    r = r && arg_new_4(b, l + 1);
+    r = r && arg_new_5(b, l + 1);
+    exit_section_(b, l, m, ARG_NEW, r, false, null);
     return r;
   }
 
-  /* ********************************************************** */
-  // ASSIGN_OP | AUGMENTED_ASSIGN_OP
-  public static boolean any_assign_op(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "any_assign_op")) return false;
-    boolean r;
-    Marker m = enter_section_(b, l, _NONE_, "<any assign op>");
-    r = ASSIGN_OP(b, l + 1);
-    if (!r) r = AUGMENTED_ASSIGN_OP(b, l + 1);
-    exit_section_(b, l, m, ANY_ASSIGN_OP, r, false, null);
-    return r;
-  }
-
-  /* ********************************************************** */
-  // (CONST_KEYWORD | AND)? tagged_identifier array_dims? argdef_default?
-  public static boolean argdef(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "argdef")) return false;
-    boolean r, p;
-    Marker m = enter_section_(b, l, _NONE_, "<argdef>");
-    r = argdef_0(b, l + 1);
-    r = r && tagged_identifier(b, l + 1);
-    p = r; // pin = 2
-    r = r && report_error_(b, argdef_2(b, l + 1));
-    r = p && argdef_3(b, l + 1) && r;
-    exit_section_(b, l, m, ARGDEF, r, p, null);
-    return r || p;
-  }
-
-  // (CONST_KEYWORD | AND)?
-  private static boolean argdef_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "argdef_0")) return false;
-    argdef_0_0(b, l + 1);
-    return true;
-  }
-
-  // CONST_KEYWORD | AND
-  private static boolean argdef_0_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "argdef_0_0")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = consumeToken(b, CONST_KEYWORD);
-    if (!r) r = consumeToken(b, AND);
-    exit_section_(b, m, null, r);
-    return r;
-  }
-
-  // array_dims?
-  private static boolean argdef_2(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "argdef_2")) return false;
-    array_dims(b, l + 1);
-    return true;
-  }
-
-  // argdef_default?
-  private static boolean argdef_3(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "argdef_3")) return false;
-    argdef_default(b, l + 1);
-    return true;
-  }
-
-  /* ********************************************************** */
-  // ASSIGN_OP simple_expression
-  public static boolean argdef_default(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "argdef_default")) return false;
-    if (!nextTokenIs(b, EQ)) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = ASSIGN_OP(b, l + 1);
-    r = r && simple_expression(b, l + 1);
-    exit_section_(b, m, ARGDEF_DEFAULT, r);
-    return r;
-  }
-
-  /* ********************************************************** */
-  // LBRACKET number? RBRACKET
-  public static boolean array_dims(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "array_dims")) return false;
-    if (!nextTokenIs(b, LBRACKET)) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = consumeToken(b, LBRACKET);
-    r = r && array_dims_1(b, l + 1);
-    r = r && consumeToken(b, RBRACKET);
-    exit_section_(b, m, ARRAY_DIMS, r);
-    return r;
-  }
-
-  // number?
-  private static boolean array_dims_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "array_dims_1")) return false;
-    number(b, l + 1);
-    return true;
-  }
-
-  /* ********************************************************** */
-  // identifier any_assign_op expression
-  public static boolean assign_expr(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "assign_expr")) return false;
-    if (!nextTokenIs(b, IDENTIFIER)) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = consumeToken(b, IDENTIFIER);
-    r = r && any_assign_op(b, l + 1);
-    r = r && expression(b, l + 1);
-    exit_section_(b, m, ASSIGN_EXPR, r);
-    return r;
-  }
-
-  /* ********************************************************** */
-  // LBRACE statement* RBRACE
-  public static boolean block_statement(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "block_statement")) return false;
-    if (!nextTokenIs(b, LBRACE)) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = consumeToken(b, LBRACE);
-    r = r && block_statement_1(b, l + 1);
-    r = r && consumeToken(b, RBRACE);
-    exit_section_(b, m, BLOCK_STATEMENT, r);
-    return r;
-  }
-
-  // statement*
-  private static boolean block_statement_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "block_statement_1")) return false;
-    int c = current_position_(b);
-    while (true) {
-      if (!statement(b, l + 1)) break;
-      if (!empty_element_parsed_guard_(b, "block_statement_1", c)) break;
-      c = current_position_(b);
-    }
-    return true;
-  }
-
-  /* ********************************************************** */
-  // simple_expression
-  //   | assign_expr
-  public static boolean complex_expression(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "complex_expression")) return false;
-    boolean r;
-    Marker m = enter_section_(b, l, _NONE_, "<complex expression>");
-    r = simple_expression(b, l + 1);
-    if (!r) r = assign_expr(b, l + 1);
-    exit_section_(b, l, m, COMPLEX_EXPRESSION, r, false, null);
-    return r;
-  }
-
-  /* ********************************************************** */
-  // DECL_KEYWORD identifier
-  public static boolean decl_expr(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "decl_expr")) return false;
-    if (!nextTokenIs(b, DECL_KEYWORD)) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = consumeTokens(b, 0, DECL_KEYWORD, IDENTIFIER);
-    exit_section_(b, m, DECL_EXPR, r);
-    return r;
-  }
-
-  /* ********************************************************** */
-  // ENUM_KEYWORD identifier COLON? enum_declaration_list
-  public static boolean enum_declaration(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "enum_declaration")) return false;
-    if (!nextTokenIs(b, ENUM_KEYWORD)) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = consumeTokens(b, 0, ENUM_KEYWORD, IDENTIFIER);
-    r = r && enum_declaration_2(b, l + 1);
-    r = r && enum_declaration_list(b, l + 1);
-    exit_section_(b, m, ENUM_DECLARATION, r);
-    return r;
-  }
-
-  // COLON?
-  private static boolean enum_declaration_2(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "enum_declaration_2")) return false;
-    consumeToken(b, COLON);
-    return true;
-  }
-
-  /* ********************************************************** */
-  // LBRACE enum_declaration_list_item (COMMA (enum_declaration_list_item | &RBRACE))* RBRACE
-  public static boolean enum_declaration_list(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "enum_declaration_list")) return false;
-    if (!nextTokenIs(b, LBRACE)) return false;
-    boolean r, p;
-    Marker m = enter_section_(b, l, _NONE_, null);
-    r = consumeToken(b, LBRACE);
-    p = r; // pin = 1
-    r = r && report_error_(b, enum_declaration_list_item(b, l + 1));
-    r = p && report_error_(b, enum_declaration_list_2(b, l + 1)) && r;
-    r = p && consumeToken(b, RBRACE) && r;
-    exit_section_(b, l, m, ENUM_DECLARATION_LIST, r, p, null);
-    return r || p;
-  }
-
-  // (COMMA (enum_declaration_list_item | &RBRACE))*
-  private static boolean enum_declaration_list_2(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "enum_declaration_list_2")) return false;
-    int c = current_position_(b);
-    while (true) {
-      if (!enum_declaration_list_2_0(b, l + 1)) break;
-      if (!empty_element_parsed_guard_(b, "enum_declaration_list_2", c)) break;
-      c = current_position_(b);
-    }
-    return true;
-  }
-
-  // COMMA (enum_declaration_list_item | &RBRACE)
-  private static boolean enum_declaration_list_2_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "enum_declaration_list_2_0")) return false;
-    boolean r, p;
-    Marker m = enter_section_(b, l, _NONE_, null);
-    r = consumeToken(b, COMMA);
-    p = r; // pin = 1
-    r = r && enum_declaration_list_2_0_1(b, l + 1);
-    exit_section_(b, l, m, null, r, p, null);
-    return r || p;
-  }
-
-  // enum_declaration_list_item | &RBRACE
-  private static boolean enum_declaration_list_2_0_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "enum_declaration_list_2_0_1")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = enum_declaration_list_item(b, l + 1);
-    if (!r) r = enum_declaration_list_2_0_1_1(b, l + 1);
-    exit_section_(b, m, null, r);
-    return r;
-  }
-
-  // &RBRACE
-  private static boolean enum_declaration_list_2_0_1_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "enum_declaration_list_2_0_1_1")) return false;
-    boolean r;
-    Marker m = enter_section_(b, l, _AND_, null);
-    r = consumeToken(b, RBRACE);
-    exit_section_(b, l, m, null, r, false, null);
-    return r;
-  }
-
-  /* ********************************************************** */
-  // tagged_identifier (ASSIGN_OP literal)?
-  public static boolean enum_declaration_list_item(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "enum_declaration_list_item")) return false;
-    if (!nextTokenIs(b, IDENTIFIER)) return false;
-    boolean r, p;
-    Marker m = enter_section_(b, l, _NONE_, null);
-    r = tagged_identifier(b, l + 1);
-    p = r; // pin = 1
-    r = r && enum_declaration_list_item_1(b, l + 1);
-    exit_section_(b, l, m, ENUM_DECLARATION_LIST_ITEM, r, p, null);
-    return r || p;
-  }
-
-  // (ASSIGN_OP literal)?
-  private static boolean enum_declaration_list_item_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "enum_declaration_list_item_1")) return false;
-    enum_declaration_list_item_1_0(b, l + 1);
-    return true;
-  }
-
-  // ASSIGN_OP literal
-  private static boolean enum_declaration_list_item_1_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "enum_declaration_list_item_1_0")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = ASSIGN_OP(b, l + 1);
-    r = r && literal(b, l + 1);
-    exit_section_(b, m, null, r);
-    return r;
-  }
-
-  /* ********************************************************** */
-  // decl_expr
-  //   | new_expr
-  //   | complex_expression
-  public static boolean expression(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "expression")) return false;
-    boolean r;
-    Marker m = enter_section_(b, l, _NONE_, "<expression>");
-    r = decl_expr(b, l + 1);
-    if (!r) r = new_expr(b, l + 1);
-    if (!r) r = complex_expression(b, l + 1);
-    exit_section_(b, l, m, EXPRESSION, r, false, null);
-    return r;
-  }
-
-  /* ********************************************************** */
-  // FORWARD_KEYWORD tagged_identifier func_proto
-  public static boolean forward_declaration(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "forward_declaration")) return false;
-    if (!nextTokenIs(b, FORWARD_KEYWORD)) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = consumeToken(b, FORWARD_KEYWORD);
-    r = r && tagged_identifier(b, l + 1);
-    r = r && func_proto(b, l + 1);
-    exit_section_(b, m, FORWARD_DECLARATION, r);
-    return r;
-  }
-
-  /* ********************************************************** */
-  // LPAREN argdef (COMMA (argdef | &RPAREN))* RPAREN
-  public static boolean func_proto(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "func_proto")) return false;
-    if (!nextTokenIs(b, LPAREN)) return false;
-    boolean r, p;
-    Marker m = enter_section_(b, l, _NONE_, null);
-    r = consumeToken(b, LPAREN);
-    p = r; // pin = 1
-    r = r && report_error_(b, argdef(b, l + 1));
-    r = p && report_error_(b, func_proto_2(b, l + 1)) && r;
-    r = p && consumeToken(b, RPAREN) && r;
-    exit_section_(b, l, m, FUNC_PROTO, r, p, null);
-    return r || p;
-  }
-
-  // (COMMA (argdef | &RPAREN))*
-  private static boolean func_proto_2(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "func_proto_2")) return false;
-    int c = current_position_(b);
-    while (true) {
-      if (!func_proto_2_0(b, l + 1)) break;
-      if (!empty_element_parsed_guard_(b, "func_proto_2", c)) break;
-      c = current_position_(b);
-    }
-    return true;
-  }
-
-  // COMMA (argdef | &RPAREN)
-  private static boolean func_proto_2_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "func_proto_2_0")) return false;
-    boolean r, p;
-    Marker m = enter_section_(b, l, _NONE_, null);
-    r = consumeToken(b, COMMA);
-    p = r; // pin = 1
-    r = r && func_proto_2_0_1(b, l + 1);
-    exit_section_(b, l, m, null, r, p, null);
-    return r || p;
-  }
-
-  // argdef | &RPAREN
-  private static boolean func_proto_2_0_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "func_proto_2_0_1")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = argdef(b, l + 1);
-    if (!r) r = func_proto_2_0_1_1(b, l + 1);
-    exit_section_(b, m, null, r);
-    return r;
-  }
-
-  // &RPAREN
-  private static boolean func_proto_2_0_1_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "func_proto_2_0_1_1")) return false;
-    boolean r;
-    Marker m = enter_section_(b, l, _AND_, null);
-    r = consumeToken(b, RPAREN);
-    exit_section_(b, l, m, null, r, false, null);
-    return r;
-  }
-
-  /* ********************************************************** */
-  // global_storage_type CONST_KEYWORD? tagged_identifier (ASSIGN_OP initializer)?
-  public static boolean global_declaration(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "global_declaration")) return false;
-    boolean r;
-    Marker m = enter_section_(b, l, _NONE_, "<global declaration>");
-    r = global_storage_type(b, l + 1);
-    r = r && global_declaration_1(b, l + 1);
-    r = r && tagged_identifier(b, l + 1);
-    r = r && global_declaration_3(b, l + 1);
-    exit_section_(b, l, m, GLOBAL_DECLARATION, r, false, null);
-    return r;
-  }
-
-  // CONST_KEYWORD?
-  private static boolean global_declaration_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "global_declaration_1")) return false;
+  // "const"?
+  private static boolean arg_new_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "arg_new_0")) return false;
     consumeToken(b, CONST_KEYWORD);
     return true;
   }
 
-  // (ASSIGN_OP initializer)?
-  private static boolean global_declaration_3(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "global_declaration_3")) return false;
-    global_declaration_3_0(b, l + 1);
+  // '&'?
+  private static boolean arg_new_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "arg_new_2")) return false;
+    consumeToken(b, AND);
     return true;
   }
 
-  // ASSIGN_OP initializer
-  private static boolean global_declaration_3_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "global_declaration_3_0")) return false;
+  // old_dims?
+  private static boolean arg_new_4(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "arg_new_4")) return false;
+    old_dims(b, l + 1);
+    return true;
+  }
+
+  // ('=' arg_init)?
+  private static boolean arg_new_5(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "arg_new_5")) return false;
+    arg_new_5_0(b, l + 1);
+    return true;
+  }
+
+  // '=' arg_init
+  private static boolean arg_new_5_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "arg_new_5_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = ASSIGN_OP(b, l + 1);
-    r = r && initializer(b, l + 1);
+    r = consumeToken(b, EQ);
+    r = r && arg_init(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
 
   /* ********************************************************** */
-  // PUBLIC_KEYWORD
-  //   | STOCK_KEYWORD
-  //   | NEW_KEYWORD
-  //   | STATIC_KEYWORD
-  public static boolean global_storage_type(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "global_storage_type")) return false;
+  // "const"? tags? '&'? symbol old_dims? ('=' arg_init)?
+  public static boolean arg_old(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "arg_old")) return false;
     boolean r;
-    Marker m = enter_section_(b, l, _NONE_, "<global storage type>");
-    r = consumeToken(b, PUBLIC_KEYWORD);
-    if (!r) r = consumeToken(b, STOCK_KEYWORD);
-    if (!r) r = consumeToken(b, NEW_KEYWORD);
-    if (!r) r = consumeToken(b, STATIC_KEYWORD);
-    exit_section_(b, l, m, GLOBAL_STORAGE_TYPE, r, false, null);
+    Marker m = enter_section_(b, l, _NONE_, "<arg old>");
+    r = arg_old_0(b, l + 1);
+    r = r && arg_old_1(b, l + 1);
+    r = r && arg_old_2(b, l + 1);
+    r = r && consumeToken(b, SYMBOL);
+    r = r && arg_old_4(b, l + 1);
+    r = r && arg_old_5(b, l + 1);
+    exit_section_(b, l, m, ARG_OLD, r, false, null);
+    return r;
+  }
+
+  // "const"?
+  private static boolean arg_old_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "arg_old_0")) return false;
+    consumeToken(b, CONST_KEYWORD);
+    return true;
+  }
+
+  // tags?
+  private static boolean arg_old_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "arg_old_1")) return false;
+    tags(b, l + 1);
+    return true;
+  }
+
+  // '&'?
+  private static boolean arg_old_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "arg_old_2")) return false;
+    consumeToken(b, AND);
+    return true;
+  }
+
+  // old_dims?
+  private static boolean arg_old_4(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "arg_old_4")) return false;
+    old_dims(b, l + 1);
+    return true;
+  }
+
+  // ('=' arg_init)?
+  private static boolean arg_old_5(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "arg_old_5")) return false;
+    arg_old_5_0(b, l + 1);
+    return true;
+  }
+
+  // '=' arg_init
+  private static boolean arg_old_5_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "arg_old_5_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, EQ);
+    r = r && arg_init(b, l + 1);
+    exit_section_(b, m, null, r);
     return r;
   }
 
   /* ********************************************************** */
-  // struct_initializer
-  //   | simple_expression
-  public static boolean initializer(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "initializer")) return false;
+  // arg_old | arg_new
+  public static boolean argdecl(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "argdecl")) return false;
     boolean r;
-    Marker m = enter_section_(b, l, _NONE_, "<initializer>");
-    r = struct_initializer(b, l + 1);
-    if (!r) r = simple_expression(b, l + 1);
-    exit_section_(b, l, m, INITIALIZER, r, false, null);
+    Marker m = enter_section_(b, l, _NONE_, "<argdecl>");
+    r = arg_old(b, l + 1);
+    if (!r) r = arg_new(b, l + 1);
+    exit_section_(b, l, m, ARGDECL, r, false, null);
     return r;
   }
 
   /* ********************************************************** */
-  // string_literal
-  //   | character_literal
-  //   | number
+  // "void"
+  //                | "int"
+  //                | "float"
+  //                | "char"
+  //                | "bool"
+  public static boolean builtin_type(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "builtin_type")) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NONE_, "<builtin type>");
+    r = consumeToken(b, "void");
+    if (!r) r = consumeToken(b, "int");
+    if (!r) r = consumeToken(b, "float");
+    if (!r) r = consumeToken(b, "char");
+    if (!r) r = consumeToken(b, "bool");
+    exit_section_(b, l, m, BUILTIN_TYPE, r, false, null);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // global_old | global_new
+  public static boolean global(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "global")) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NONE_, "<global>");
+    r = global_old(b, l + 1);
+    if (!r) r = global_new(b, l + 1);
+    exit_section_(b, l, m, GLOBAL, r, false, null);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // global '=' literal
+  public static boolean global_assn(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "global_assn")) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NONE_, "<global assn>");
+    r = global(b, l + 1);
+    r = r && consumeToken(b, EQ);
+    r = r && literal(b, l + 1);
+    exit_section_(b, l, m, GLOBAL_ASSN, r, false, null);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // storage_class* type_expr symbol old_dims?
+  public static boolean global_new(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "global_new")) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NONE_, "<global new>");
+    r = global_new_0(b, l + 1);
+    r = r && type_expr(b, l + 1);
+    r = r && consumeToken(b, SYMBOL);
+    r = r && global_new_3(b, l + 1);
+    exit_section_(b, l, m, GLOBAL_NEW, r, false, null);
+    return r;
+  }
+
+  // storage_class*
+  private static boolean global_new_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "global_new_0")) return false;
+    int c = current_position_(b);
+    while (true) {
+      if (!storage_class(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "global_new_0", c)) break;
+      c = current_position_(b);
+    }
+    return true;
+  }
+
+  // old_dims?
+  private static boolean global_new_3(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "global_new_3")) return false;
+    old_dims(b, l + 1);
+    return true;
+  }
+
+  /* ********************************************************** */
+  // storage_class* tag? symbol old_dims?
+  public static boolean global_old(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "global_old")) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NONE_, "<global old>");
+    r = global_old_0(b, l + 1);
+    r = r && global_old_1(b, l + 1);
+    r = r && consumeToken(b, SYMBOL);
+    r = r && global_old_3(b, l + 1);
+    exit_section_(b, l, m, GLOBAL_OLD, r, false, null);
+    return r;
+  }
+
+  // storage_class*
+  private static boolean global_old_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "global_old_0")) return false;
+    int c = current_position_(b);
+    while (true) {
+      if (!storage_class(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "global_old_0", c)) break;
+      c = current_position_(b);
+    }
+    return true;
+  }
+
+  // tag?
+  private static boolean global_old_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "global_old_1")) return false;
+    tag(b, l + 1);
+    return true;
+  }
+
+  // old_dims?
+  private static boolean global_old_3(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "global_old_3")) return false;
+    old_dims(b, l + 1);
+    return true;
+  }
+
+  /* ********************************************************** */
+  // symbol ':'
+  public static boolean label(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "label")) return false;
+    if (!nextTokenIs(b, SYMBOL)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, SYMBOL);
+    r = r && consumeToken(b, COLON);
+    exit_section_(b, m, LABEL, r);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // number | string_literal | character_literal
   public static boolean literal(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "literal")) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, "<literal>");
-    r = consumeToken(b, STRING_LITERAL);
+    r = number(b, l + 1);
+    if (!r) r = consumeToken(b, STRING_LITERAL);
     if (!r) r = consumeToken(b, CHARACTER_LITERAL);
-    if (!r) r = number(b, l + 1);
     exit_section_(b, l, m, LITERAL, r, false, null);
     return r;
   }
 
   /* ********************************************************** */
-  // NEW_KEYWORD
-  //   | STATIC_KEYWORD
-  public static boolean local_storage_type(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "local_storage_type")) return false;
-    if (!nextTokenIs(b, "<local storage type>", NEW_KEYWORD, STATIC_KEYWORD)) return false;
-    boolean r;
-    Marker m = enter_section_(b, l, _NONE_, "<local storage type>");
-    r = consumeToken(b, NEW_KEYWORD);
-    if (!r) r = consumeToken(b, STATIC_KEYWORD);
-    exit_section_(b, l, m, LOCAL_STORAGE_TYPE, r, false, null);
-    return r;
-  }
-
-  /* ********************************************************** */
-  // NATIVE_KEYWORD tagged_identifier func_proto
-  public static boolean native_declaration(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "native_declaration")) return false;
-    if (!nextTokenIs(b, NATIVE_KEYWORD)) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = consumeToken(b, NATIVE_KEYWORD);
-    r = r && tagged_identifier(b, l + 1);
-    r = r && func_proto(b, l + 1);
-    exit_section_(b, m, NATIVE_DECLARATION, r);
-    return r;
-  }
-
-  /* ********************************************************** */
-  // local_storage_type identifier (ASSIGN_OP expression)?
-  public static boolean new_expr(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "new_expr")) return false;
-    if (!nextTokenIs(b, "<new expr>", NEW_KEYWORD, STATIC_KEYWORD)) return false;
-    boolean r;
-    Marker m = enter_section_(b, l, _NONE_, "<new expr>");
-    r = local_storage_type(b, l + 1);
-    r = r && consumeToken(b, IDENTIFIER);
-    r = r && new_expr_2(b, l + 1);
-    exit_section_(b, l, m, NEW_EXPR, r, false, null);
-    return r;
-  }
-
-  // (ASSIGN_OP expression)?
-  private static boolean new_expr_2(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "new_expr_2")) return false;
-    new_expr_2_0(b, l + 1);
+  // ('[' ']')*
+  public static boolean new_dims(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "new_dims")) return false;
+    Marker m = enter_section_(b, l, _NONE_, "<new dims>");
+    int c = current_position_(b);
+    while (true) {
+      if (!new_dims_0(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "new_dims", c)) break;
+      c = current_position_(b);
+    }
+    exit_section_(b, l, m, NEW_DIMS, true, false, null);
     return true;
   }
 
-  // ASSIGN_OP expression
-  private static boolean new_expr_2_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "new_expr_2_0")) return false;
+  // '[' ']'
+  private static boolean new_dims_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "new_dims_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = ASSIGN_OP(b, l + 1);
-    r = r && expression(b, l + 1);
+    r = consumeToken(b, LBRACKET);
+    r = r && consumeToken(b, RBRACKET);
     exit_section_(b, m, null, r);
     return r;
   }
 
   /* ********************************************************** */
-  // integer_literal
-  //   | float_literal
-  //   | hex_literal
-  //   | binary_literal
+  // integer_literal | hex_literal | float_literal
   public static boolean number(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "number")) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, "<number>");
     r = consumeToken(b, INTEGER_LITERAL);
-    if (!r) r = consumeToken(b, FLOAT_LITERAL);
     if (!r) r = consumeToken(b, HEX_LITERAL);
-    if (!r) r = consumeToken(b, BINARY_LITERAL);
+    if (!r) r = consumeToken(b, FLOAT_LITERAL);
     exit_section_(b, l, m, NUMBER, r, false, null);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // ('[' expr? ']')+
+  public static boolean old_dims(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "old_dims")) return false;
+    if (!nextTokenIs(b, LBRACKET)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = old_dims_0(b, l + 1);
+    int c = current_position_(b);
+    while (r) {
+      if (!old_dims_0(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "old_dims", c)) break;
+      c = current_position_(b);
+    }
+    exit_section_(b, m, OLD_DIMS, r);
+    return r;
+  }
+
+  // '[' expr? ']'
+  private static boolean old_dims_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "old_dims_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, LBRACKET);
+    r = r && old_dims_0_1(b, l + 1);
+    r = r && consumeToken(b, RBRACKET);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // expr?
+  private static boolean old_dims_0_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "old_dims_0_1")) return false;
+    consumeToken(b, EXPR);
+    return true;
+  }
+
+  /* ********************************************************** */
+  // type_expr new_dims?
+  public static boolean return_new(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "return_new")) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NONE_, "<return new>");
+    r = type_expr(b, l + 1);
+    r = r && return_new_1(b, l + 1);
+    exit_section_(b, l, m, RETURN_NEW, r, false, null);
+    return r;
+  }
+
+  // new_dims?
+  private static boolean return_new_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "return_new_1")) return false;
+    new_dims(b, l + 1);
+    return true;
+  }
+
+  /* ********************************************************** */
+  // old_dims? label?
+  public static boolean return_old(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "return_old")) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NONE_, "<return old>");
+    r = return_old_0(b, l + 1);
+    r = r && return_old_1(b, l + 1);
+    exit_section_(b, l, m, RETURN_OLD, r, false, null);
+    return r;
+  }
+
+  // old_dims?
+  private static boolean return_old_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "return_old_0")) return false;
+    old_dims(b, l + 1);
+    return true;
+  }
+
+  // label?
+  private static boolean return_old_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "return_old_1")) return false;
+    label(b, l + 1);
+    return true;
+  }
+
+  /* ********************************************************** */
+  // return_old | return_new
+  public static boolean return_type(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "return_type")) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NONE_, "<return type>");
+    r = return_old(b, l + 1);
+    if (!r) r = return_new(b, l + 1);
+    exit_section_(b, l, m, RETURN_TYPE, r, false, null);
     return r;
   }
 
@@ -699,193 +544,211 @@ public class SourcePawnParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // top_level_statement
+  // global_assn SEMICOLON
   static boolean root_item(PsiBuilder b, int l) {
-    return top_level_statement(b, l + 1);
-  }
-
-  /* ********************************************************** */
-  // literal
-  //   | tagged_identifier
-  public static boolean simple_expression(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "simple_expression")) return false;
-    boolean r;
-    Marker m = enter_section_(b, l, _NONE_, "<simple expression>");
-    r = literal(b, l + 1);
-    if (!r) r = tagged_identifier(b, l + 1);
-    exit_section_(b, l, m, SIMPLE_EXPRESSION, r, false, null);
-    return r;
-  }
-
-  /* ********************************************************** */
-  // expression SEMICOLON
-  public static boolean single_statement(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "single_statement")) return false;
-    boolean r;
-    Marker m = enter_section_(b, l, _NONE_, "<single statement>");
-    r = expression(b, l + 1);
-    r = r && consumeToken(b, SEMICOLON);
-    exit_section_(b, l, m, SINGLE_STATEMENT, r, false, null);
-    return r;
-  }
-
-  /* ********************************************************** */
-  // block_statement
-  //   | single_statement
-  public static boolean statement(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "statement")) return false;
-    boolean r;
-    Marker m = enter_section_(b, l, _NONE_, "<statement>");
-    r = block_statement(b, l + 1);
-    if (!r) r = single_statement(b, l + 1);
-    exit_section_(b, l, m, STATEMENT, r, false, null);
-    return r;
-  }
-
-  /* ********************************************************** */
-  // LBRACE struct_initializer_item (COMMA (struct_initializer_item | &RBRACE))* RBRACE
-  public static boolean struct_initializer(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "struct_initializer")) return false;
-    if (!nextTokenIs(b, LBRACE)) return false;
-    boolean r, p;
-    Marker m = enter_section_(b, l, _NONE_, null);
-    r = consumeToken(b, LBRACE);
-    p = r; // pin = 1
-    r = r && report_error_(b, struct_initializer_item(b, l + 1));
-    r = p && report_error_(b, struct_initializer_2(b, l + 1)) && r;
-    r = p && consumeToken(b, RBRACE) && r;
-    exit_section_(b, l, m, STRUCT_INITIALIZER, r, p, null);
-    return r || p;
-  }
-
-  // (COMMA (struct_initializer_item | &RBRACE))*
-  private static boolean struct_initializer_2(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "struct_initializer_2")) return false;
-    int c = current_position_(b);
-    while (true) {
-      if (!struct_initializer_2_0(b, l + 1)) break;
-      if (!empty_element_parsed_guard_(b, "struct_initializer_2", c)) break;
-      c = current_position_(b);
-    }
-    return true;
-  }
-
-  // COMMA (struct_initializer_item | &RBRACE)
-  private static boolean struct_initializer_2_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "struct_initializer_2_0")) return false;
-    boolean r, p;
-    Marker m = enter_section_(b, l, _NONE_, null);
-    r = consumeToken(b, COMMA);
-    p = r; // pin = 1
-    r = r && struct_initializer_2_0_1(b, l + 1);
-    exit_section_(b, l, m, null, r, p, null);
-    return r || p;
-  }
-
-  // struct_initializer_item | &RBRACE
-  private static boolean struct_initializer_2_0_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "struct_initializer_2_0_1")) return false;
+    if (!recursion_guard_(b, l, "root_item")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = struct_initializer_item(b, l + 1);
-    if (!r) r = struct_initializer_2_0_1_1(b, l + 1);
+    r = global_assn(b, l + 1);
+    r = r && consumeToken(b, SEMICOLON);
     exit_section_(b, m, null, r);
     return r;
   }
 
-  // &RBRACE
-  private static boolean struct_initializer_2_0_1_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "struct_initializer_2_0_1_1")) return false;
+  /* ********************************************************** */
+  // "public" | "static" | "const" | "stock"
+  public static boolean storage_class(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "storage_class")) return false;
     boolean r;
-    Marker m = enter_section_(b, l, _AND_, null);
-    r = consumeToken(b, RBRACE);
-    exit_section_(b, l, m, null, r, false, null);
+    Marker m = enter_section_(b, l, _NONE_, "<storage class>");
+    r = consumeToken(b, PUBLIC_KEYWORD);
+    if (!r) r = consumeToken(b, STATIC_KEYWORD);
+    if (!r) r = consumeToken(b, CONST_KEYWORD);
+    if (!r) r = consumeToken(b, STOCK_KEYWORD);
+    exit_section_(b, l, m, STORAGE_CLASS, r, false, null);
     return r;
   }
 
   /* ********************************************************** */
-  // identifier ASSIGN_OP initializer
-  public static boolean struct_initializer_item(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "struct_initializer_item")) return false;
-    if (!nextTokenIs(b, IDENTIFIER)) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = consumeToken(b, IDENTIFIER);
-    r = r && ASSIGN_OP(b, l + 1);
-    r = r && initializer(b, l + 1);
-    exit_section_(b, m, STRUCT_INITIALIZER_ITEM, r);
-    return r;
-  }
-
-  /* ********************************************************** */
-  // identifier
+  // label
   public static boolean tag(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "tag")) return false;
-    if (!nextTokenIs(b, IDENTIFIER)) return false;
+    if (!nextTokenIs(b, SYMBOL)) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = consumeToken(b, IDENTIFIER);
+    r = label(b, l + 1);
     exit_section_(b, m, TAG, r);
     return r;
   }
 
   /* ********************************************************** */
-  // (tag COLON)? identifier
-  public static boolean tagged_identifier(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "tagged_identifier")) return false;
-    if (!nextTokenIs(b, IDENTIFIER)) return false;
+  // '{' symbol (',' symbol)* '}' ':'
+  public static boolean tag_vector(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "tag_vector")) return false;
+    if (!nextTokenIs(b, LBRACE)) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = tagged_identifier_0(b, l + 1);
-    r = r && consumeToken(b, IDENTIFIER);
-    exit_section_(b, m, TAGGED_IDENTIFIER, r);
+    r = consumeToken(b, LBRACE);
+    r = r && consumeToken(b, SYMBOL);
+    r = r && tag_vector_2(b, l + 1);
+    r = r && consumeToken(b, RBRACE);
+    r = r && consumeToken(b, COLON);
+    exit_section_(b, m, TAG_VECTOR, r);
     return r;
   }
 
-  // (tag COLON)?
-  private static boolean tagged_identifier_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "tagged_identifier_0")) return false;
-    tagged_identifier_0_0(b, l + 1);
+  // (',' symbol)*
+  private static boolean tag_vector_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "tag_vector_2")) return false;
+    int c = current_position_(b);
+    while (true) {
+      if (!tag_vector_2_0(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "tag_vector_2", c)) break;
+      c = current_position_(b);
+    }
     return true;
   }
 
-  // tag COLON
-  private static boolean tagged_identifier_0_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "tagged_identifier_0_0")) return false;
+  // ',' symbol
+  private static boolean tag_vector_2_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "tag_vector_2_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = tag(b, l + 1);
-    r = r && consumeToken(b, COLON);
+    r = consumeToken(b, COMMA);
+    r = r && consumeToken(b, SYMBOL);
     exit_section_(b, m, null, r);
     return r;
   }
 
   /* ********************************************************** */
-  // top_level_statement_item SEMICOLON
-  public static boolean top_level_statement(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "top_level_statement")) return false;
+  // tag_vector | tag
+  public static boolean tags(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "tags")) return false;
+    if (!nextTokenIs(b, "<tags>", LBRACE, SYMBOL)) return false;
     boolean r;
-    Marker m = enter_section_(b, l, _NONE_, "<top level statement>");
-    r = top_level_statement_item(b, l + 1);
-    r = r && consumeToken(b, SEMICOLON);
-    exit_section_(b, l, m, TOP_LEVEL_STATEMENT, r, false, null);
+    Marker m = enter_section_(b, l, _NONE_, "<tags>");
+    r = tag_vector(b, l + 1);
+    if (!r) r = tag(b, l + 1);
+    exit_section_(b, l, m, TAGS, r, false, null);
     return r;
   }
 
   /* ********************************************************** */
-  // enum_declaration
-  //   | global_declaration
-  //   | forward_declaration
-  //   | native_declaration
-  public static boolean top_level_statement_item(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "top_level_statement_item")) return false;
+  // (builtin_type | symbol) new_dims?
+  public static boolean type_expr(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "type_expr")) return false;
     boolean r;
-    Marker m = enter_section_(b, l, _NONE_, "<top level statement item>");
-    r = enum_declaration(b, l + 1);
-    if (!r) r = global_declaration(b, l + 1);
-    if (!r) r = forward_declaration(b, l + 1);
-    if (!r) r = native_declaration(b, l + 1);
-    exit_section_(b, l, m, TOP_LEVEL_STATEMENT_ITEM, r, false, null);
+    Marker m = enter_section_(b, l, _NONE_, "<type expr>");
+    r = type_expr_0(b, l + 1);
+    r = r && type_expr_1(b, l + 1);
+    exit_section_(b, l, m, TYPE_EXPR, r, false, null);
+    return r;
+  }
+
+  // builtin_type | symbol
+  private static boolean type_expr_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "type_expr_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = builtin_type(b, l + 1);
+    if (!r) r = consumeToken(b, SYMBOL);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // new_dims?
+  private static boolean type_expr_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "type_expr_1")) return false;
+    new_dims(b, l + 1);
+    return true;
+  }
+
+  /* ********************************************************** */
+  // var_new_prefix type_expr symbol old_dims?
+  public static boolean var_new(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "var_new")) return false;
+    if (!nextTokenIs(b, "<var new>", CONST_KEYWORD, STATIC_KEYWORD)) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NONE_, "<var new>");
+    r = var_new_prefix(b, l + 1);
+    r = r && type_expr(b, l + 1);
+    r = r && consumeToken(b, SYMBOL);
+    r = r && var_new_3(b, l + 1);
+    exit_section_(b, l, m, VAR_NEW, r, false, null);
+    return r;
+  }
+
+  // old_dims?
+  private static boolean var_new_3(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "var_new_3")) return false;
+    old_dims(b, l + 1);
+    return true;
+  }
+
+  /* ********************************************************** */
+  // "static" | "const"
+  public static boolean var_new_prefix(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "var_new_prefix")) return false;
+    if (!nextTokenIs(b, "<var new prefix>", CONST_KEYWORD, STATIC_KEYWORD)) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NONE_, "<var new prefix>");
+    r = consumeToken(b, STATIC_KEYWORD);
+    if (!r) r = consumeToken(b, CONST_KEYWORD);
+    exit_section_(b, l, m, VAR_NEW_PREFIX, r, false, null);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // var_old_prefix tag? symbol old_dims?
+  public static boolean var_old(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "var_old")) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NONE_, "<var old>");
+    r = var_old_prefix(b, l + 1);
+    r = r && var_old_1(b, l + 1);
+    r = r && consumeToken(b, SYMBOL);
+    r = r && var_old_3(b, l + 1);
+    exit_section_(b, l, m, VAR_OLD, r, false, null);
+    return r;
+  }
+
+  // tag?
+  private static boolean var_old_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "var_old_1")) return false;
+    tag(b, l + 1);
+    return true;
+  }
+
+  // old_dims?
+  private static boolean var_old_3(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "var_old_3")) return false;
+    old_dims(b, l + 1);
+    return true;
+  }
+
+  /* ********************************************************** */
+  // "new" | "decl" | "static" | "const"
+  public static boolean var_old_prefix(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "var_old_prefix")) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NONE_, "<var old prefix>");
+    r = consumeToken(b, NEW_KEYWORD);
+    if (!r) r = consumeToken(b, DECL_KEYWORD);
+    if (!r) r = consumeToken(b, STATIC_KEYWORD);
+    if (!r) r = consumeToken(b, CONST_KEYWORD);
+    exit_section_(b, l, m, VAR_OLD_PREFIX, r, false, null);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // var_old | var_new
+  public static boolean vardecl(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "vardecl")) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NONE_, "<vardecl>");
+    r = var_old(b, l + 1);
+    if (!r) r = var_new(b, l + 1);
+    exit_section_(b, l, m, VARDECL, r, false, null);
     return r;
   }
 

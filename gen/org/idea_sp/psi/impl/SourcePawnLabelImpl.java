@@ -11,33 +11,21 @@ import static org.idea_sp.psi.SourcePawnTypes.*;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import org.idea_sp.psi.*;
 
-public class SourcePawnNumberImpl extends ASTWrapperPsiElement implements SourcePawnNumber {
+public class SourcePawnLabelImpl extends ASTWrapperPsiElement implements SourcePawnLabel {
 
-  public SourcePawnNumberImpl(ASTNode node) {
+  public SourcePawnLabelImpl(ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof SourcePawnVisitor) ((SourcePawnVisitor)visitor).visitNumber(this);
+    if (visitor instanceof SourcePawnVisitor) ((SourcePawnVisitor)visitor).visitLabel(this);
     else super.accept(visitor);
   }
 
   @Override
-  @Nullable
-  public PsiElement getFloatLiteral() {
-    return findChildByType(FLOAT_LITERAL);
-  }
-
-  @Override
-  @Nullable
-  public PsiElement getHexLiteral() {
-    return findChildByType(HEX_LITERAL);
-  }
-
-  @Override
-  @Nullable
-  public PsiElement getIntegerLiteral() {
-    return findChildByType(INTEGER_LITERAL);
+  @NotNull
+  public PsiElement getSymbol() {
+    return findNotNullChildByType(SYMBOL);
   }
 
 }

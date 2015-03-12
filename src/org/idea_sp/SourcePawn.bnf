@@ -105,7 +105,7 @@
     preprocessor_comment="regexp:#(assert|define|else|elseif|endif|endinput|error|file|if|include|line|pragma|section|tryinclude|undef)[^\r\n]*"
 
     integer_literal="regexp:[-+]?\d[_\d]*"
-    float_literal="regexp:[-+]?\d[_\d]*\.\d[_\d]*"
+    float_literal="regexp:[-+]?\d[_\d]*\.\d[_\d]*(e[-+]?\d+)?"
     hex_literal="regexp:[-+]?0x[a-fA-F0-9_]+"
     binary_literal="regexp:[-+]?0b[01_]+"
 
@@ -114,119 +114,62 @@
 
     // @ and _ are not themselves valid identifiers.
     identifier="regexp:([@_a-zA-Z][@_a-zA-Z0-9]+|[a-zA-Z][@_a-zA-Z0-9]*)"
+
+
+    // xxx///////////////
+    // Below is from an attempt to use dvander's grammar as a base
+    // See https://wiki.alliedmods.net/SourcePawn_Transitional_Syntax#Grammar
+
+    // This is dvander's symbol. It doesn't handle all the edge cases Pawn allows
+//    symbol="regexp:[A-Za-z_]([A-Za-z0-9_@]*)"
+    symbol="regexp:([@_a-zA-Z][@_a-zA-Z0-9]+|[a-zA-Z][@_a-zA-Z0-9]*)"
   ]
 }
 
 
 root ::= root_item *
-private root_item ::=
-    top_level_statement
+private root_item ::= global_assn SEMICOLON
 
 
-top_level_statement ::= top_level_statement_item SEMICOLON
-
-top_level_statement_item ::=
-    enum_declaration
-  | global_declaration
-  | forward_declaration
-  | native_declaration
-//  | func_def
+global_assn ::= global '=' literal
 
 
-global_declaration ::= global_storage_type CONST_KEYWORD? tagged_identifier (ASSIGN_OP initializer)?
+return_type ::= return_old | return_new
+return_new ::= type_expr new_dims?        // Note, dims not yet supported.
+return_old ::= old_dims? label?
 
-// Enums
-enum_declaration ::= ENUM_KEYWORD identifier COLON? enum_declaration_list
-enum_declaration_list ::= LBRACE enum_declaration_list_item (COMMA (enum_declaration_list_item | &RBRACE))* RBRACE {pin(".*")=1}
-enum_declaration_list_item ::= tagged_identifier (ASSIGN_OP literal)? {pin=1}
+argdecl ::= arg_old | arg_new
+arg_new ::= "const"? type_expr '&'? symbol old_dims? ('=' arg_init)?
+arg_old ::= "const"? tags? '&'? symbol old_dims? ('=' arg_init)?
+arg_init ::= literal | symbol
 
-// Forwards
-forward_declaration ::= FORWARD_KEYWORD tagged_identifier func_proto
+vardecl ::= var_old | var_new
+var_new ::= var_new_prefix type_expr symbol old_dims?
+var_new_prefix ::= "static" | "const"
+var_old ::= var_old_prefix tag? symbol old_dims?
+var_old_prefix ::= "new" | "decl" | "static" | "const"
 
-// Natives
-native_declaration ::= NATIVE_KEYWORD tagged_identifier func_proto
+global ::= global_old | global_new
+global_new ::= storage_class* type_expr symbol old_dims?
+global_old ::= storage_class* tag? symbol old_dims?
 
+storage_class ::= "public" | "static" | "const" | "stock"
 
-func_proto ::= LPAREN argdef (COMMA (argdef | &RPAREN))* RPAREN {pin(".*")=1}
-argdef ::= (CONST_KEYWORD | AND)? tagged_identifier array_dims? argdef_default? {pin=2}
-argdef_default ::= ASSIGN_OP simple_expression
-array_dims ::= LBRACKET number? RBRACKET
+type_expr ::= (builtin_type | symbol) new_dims?
+builtin_type ::= "void"
+               | "int"
+               | "float"
+               | "char"
+               | "bool"
 
+tags ::= tag_vector | tag
+tag_vector ::= '{' symbol (',' symbol)* '}' ':'
+tag ::= label
 
-statement ::=
-    block_statement
-  | single_statement
+new_dims ::= ('[' ']')*
+old_dims ::= ('[' expr? ']')+
 
-block_statement ::= LBRACE statement* RBRACE
-single_statement ::= expression SEMICOLON
+label ::= symbol ':'
 
-expression ::=
-    decl_expr
-  | new_expr
-  | complex_expression
-
-complex_expression ::=
-    simple_expression
-  | assign_expr
-
-simple_expression ::=
-    literal
-  | tagged_identifier
-
-decl_expr ::= DECL_KEYWORD identifier
-new_expr ::= local_storage_type identifier (ASSIGN_OP expression)?
-assign_expr ::= identifier any_assign_op expression
-
-
-initializer ::=
-    struct_initializer
-  | simple_expression
-
-
-// Complicated because it allows for trailing commas
-struct_initializer ::= LBRACE struct_initializer_item (COMMA (struct_initializer_item | &RBRACE))* RBRACE {pin(".*")=1}
-struct_initializer_item ::= identifier ASSIGN_OP initializer
-
-
-tag ::= identifier
-tagged_identifier ::= (tag COLON)? identifier
-
-
-literal ::=
-    string_literal
-  | character_literal
-  | number
-
-
-number ::=
-    integer_literal
-  | float_literal
-  | hex_literal
-  | binary_literal
-
-
-any_assign_op ::= (ASSIGN_OP | AUGMENTED_ASSIGN_OP)
-ASSIGN_OP ::= EQ
-AUGMENTED_ASSIGN_OP ::= (
-    PLUSEQ
-  | MINUSEQ
-  | ASTERISKEQ
-  | DIVEQ
-  | ANDEQ
-)
-
-
-global_storage_type ::= (
-    PUBLIC_KEYWORD
-  | STOCK_KEYWORD
-  | NEW_KEYWORD
-  | STATIC_KEYWORD
-)
-
-local_storage_type ::= (
-    NEW_KEYWORD
-  | STATIC_KEYWORD
-)
-
-// TODO: remove me (for live preview purposes only)
-external space ::= SPACE
+literal ::= number | string_literal | character_literal
+number ::= integer_literal | hex_literal | float_literal

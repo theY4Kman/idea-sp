@@ -22,19 +22,17 @@ EOL="\r"|"\n"|"\r\n"
 LINE_WS=[\ \t\f]
 WHITE_SPACE=({LINE_WS}|{EOL})+
 
-ANYTHING=.|{EOL}
+SPACE=[\ \n\r\t\f]
 LINE_COMMENT="//"[^\r\n]*
-//BLOCK_COMMENT="/"\*(.|\n)*?\*"/"
+BLOCK_COMMENT="/"\*(.|\n)*?\*"/"
 PREPROCESSOR_COMMENT=#(assert|define|else|elseif|endif|endinput|error|file|if|include|line|pragma|section|tryinclude|undef)[^\r\n]*
-INTEGER_LITERAL=[-+]?[:digit:][_:digit:]*
-FLOAT_LITERAL=[-+]?[0-9][_\d]*\.[0-9][_\d]*
+INTEGER_LITERAL=[-+]?[0-9][_\d]*
+FLOAT_LITERAL=[-+]?[0-9][_\d]*\.[0-9][_\d]*(e[-+]?[0-9]+)?
 HEX_LITERAL=[-+]?0x[a-fA-F0-9_]+
 BINARY_LITERAL=[-+]?0b[01_]+
 STRING_LITERAL=\"(\\.|[^\"])*\"
 CHARACTER_LITERAL='(\\.|[^\"])'
-IDENTIFIER=([@_a-zA-Z][@_a-zA-Z0-9]+|[a-zA-Z][@_a-zA-Z0-9]*)
-
-%state IN_COMMENT
+SYMBOL=([@_a-zA-Z][@_a-zA-Z0-9]+|[a-zA-Z][@_a-zA-Z0-9]*)
 
 %%
 <YYINITIAL> {
@@ -111,14 +109,13 @@ IDENTIFIER=([@_a-zA-Z][@_a-zA-Z0-9]+|[a-zA-Z][@_a-zA-Z0-9]*)
   "static"                    { return STATIC_KEYWORD; }
   "stock"                     { return STOCK_KEYWORD; }
   "decl"                      { return DECL_KEYWORD; }
-
-  // SourcePawn-specific keywords
   "enum"                      { return ENUM_KEYWORD; }
   "struct"                    { return STRUCT_KEYWORD; }
+  "expr"                      { return EXPR; }
 
-  "/*"                        { yybegin(IN_COMMENT); return BLOCK_COMMENT; }
-
+  {SPACE}                     { return SPACE; }
   {LINE_COMMENT}              { return LINE_COMMENT; }
+  {BLOCK_COMMENT}             { return BLOCK_COMMENT; }
   {PREPROCESSOR_COMMENT}      { return PREPROCESSOR_COMMENT; }
   {INTEGER_LITERAL}           { return INTEGER_LITERAL; }
   {FLOAT_LITERAL}             { return FLOAT_LITERAL; }
@@ -126,12 +123,7 @@ IDENTIFIER=([@_a-zA-Z][@_a-zA-Z0-9]+|[a-zA-Z][@_a-zA-Z0-9]*)
   {BINARY_LITERAL}            { return BINARY_LITERAL; }
   {STRING_LITERAL}            { return STRING_LITERAL; }
   {CHARACTER_LITERAL}         { return CHARACTER_LITERAL; }
-  {IDENTIFIER}                { return IDENTIFIER; }
+  {SYMBOL}                    { return SYMBOL; }
 
   [^] { return com.intellij.psi.TokenType.BAD_CHARACTER; }
-}
-
-<IN_COMMENT> {
-    "*/"                        { yybegin(YYINITIAL); }
-    {ANYTHING}                  {  }
 }

@@ -8,39 +8,33 @@ import org.idea_sp.psi.impl.*;
 
 public interface SourcePawnTypes {
 
-  IElementType ANY_ASSIGN_OP = new SourcePawnElementType("ANY_ASSIGN_OP");
-  IElementType ARGDEF = new SourcePawnElementType("ARGDEF");
-  IElementType ARGDEF_DEFAULT = new SourcePawnElementType("ARGDEF_DEFAULT");
-  IElementType ARRAY_DIMS = new SourcePawnElementType("ARRAY_DIMS");
-  IElementType ASSIGN_EXPR = new SourcePawnElementType("ASSIGN_EXPR");
-  IElementType ASSIGN_OP = new SourcePawnElementType("ASSIGN_OP");
-  IElementType AUGMENTED_ASSIGN_OP = new SourcePawnElementType("AUGMENTED_ASSIGN_OP");
-  IElementType BLOCK_STATEMENT = new SourcePawnElementType("BLOCK_STATEMENT");
-  IElementType COMPLEX_EXPRESSION = new SourcePawnElementType("COMPLEX_EXPRESSION");
-  IElementType DECL_EXPR = new SourcePawnElementType("DECL_EXPR");
-  IElementType ENUM_DECLARATION = new SourcePawnElementType("ENUM_DECLARATION");
-  IElementType ENUM_DECLARATION_LIST = new SourcePawnElementType("ENUM_DECLARATION_LIST");
-  IElementType ENUM_DECLARATION_LIST_ITEM = new SourcePawnElementType("ENUM_DECLARATION_LIST_ITEM");
-  IElementType EXPRESSION = new SourcePawnElementType("EXPRESSION");
-  IElementType FORWARD_DECLARATION = new SourcePawnElementType("FORWARD_DECLARATION");
-  IElementType FUNC_PROTO = new SourcePawnElementType("FUNC_PROTO");
-  IElementType GLOBAL_DECLARATION = new SourcePawnElementType("GLOBAL_DECLARATION");
-  IElementType GLOBAL_STORAGE_TYPE = new SourcePawnElementType("GLOBAL_STORAGE_TYPE");
-  IElementType INITIALIZER = new SourcePawnElementType("INITIALIZER");
+  IElementType ARGDECL = new SourcePawnElementType("ARGDECL");
+  IElementType ARG_INIT = new SourcePawnElementType("ARG_INIT");
+  IElementType ARG_NEW = new SourcePawnElementType("ARG_NEW");
+  IElementType ARG_OLD = new SourcePawnElementType("ARG_OLD");
+  IElementType BUILTIN_TYPE = new SourcePawnElementType("BUILTIN_TYPE");
+  IElementType GLOBAL = new SourcePawnElementType("GLOBAL");
+  IElementType GLOBAL_ASSN = new SourcePawnElementType("GLOBAL_ASSN");
+  IElementType GLOBAL_NEW = new SourcePawnElementType("GLOBAL_NEW");
+  IElementType GLOBAL_OLD = new SourcePawnElementType("GLOBAL_OLD");
+  IElementType LABEL = new SourcePawnElementType("LABEL");
   IElementType LITERAL = new SourcePawnElementType("LITERAL");
-  IElementType LOCAL_STORAGE_TYPE = new SourcePawnElementType("LOCAL_STORAGE_TYPE");
-  IElementType NATIVE_DECLARATION = new SourcePawnElementType("NATIVE_DECLARATION");
-  IElementType NEW_EXPR = new SourcePawnElementType("NEW_EXPR");
+  IElementType NEW_DIMS = new SourcePawnElementType("NEW_DIMS");
   IElementType NUMBER = new SourcePawnElementType("NUMBER");
-  IElementType SIMPLE_EXPRESSION = new SourcePawnElementType("SIMPLE_EXPRESSION");
-  IElementType SINGLE_STATEMENT = new SourcePawnElementType("SINGLE_STATEMENT");
-  IElementType STATEMENT = new SourcePawnElementType("STATEMENT");
-  IElementType STRUCT_INITIALIZER = new SourcePawnElementType("STRUCT_INITIALIZER");
-  IElementType STRUCT_INITIALIZER_ITEM = new SourcePawnElementType("STRUCT_INITIALIZER_ITEM");
+  IElementType OLD_DIMS = new SourcePawnElementType("OLD_DIMS");
+  IElementType RETURN_NEW = new SourcePawnElementType("RETURN_NEW");
+  IElementType RETURN_OLD = new SourcePawnElementType("RETURN_OLD");
+  IElementType RETURN_TYPE = new SourcePawnElementType("RETURN_TYPE");
+  IElementType STORAGE_CLASS = new SourcePawnElementType("STORAGE_CLASS");
   IElementType TAG = new SourcePawnElementType("TAG");
-  IElementType TAGGED_IDENTIFIER = new SourcePawnElementType("TAGGED_IDENTIFIER");
-  IElementType TOP_LEVEL_STATEMENT = new SourcePawnElementType("TOP_LEVEL_STATEMENT");
-  IElementType TOP_LEVEL_STATEMENT_ITEM = new SourcePawnElementType("TOP_LEVEL_STATEMENT_ITEM");
+  IElementType TAGS = new SourcePawnElementType("TAGS");
+  IElementType TAG_VECTOR = new SourcePawnElementType("TAG_VECTOR");
+  IElementType TYPE_EXPR = new SourcePawnElementType("TYPE_EXPR");
+  IElementType VARDECL = new SourcePawnElementType("VARDECL");
+  IElementType VAR_NEW = new SourcePawnElementType("VAR_NEW");
+  IElementType VAR_NEW_PREFIX = new SourcePawnElementType("VAR_NEW_PREFIX");
+  IElementType VAR_OLD = new SourcePawnElementType("VAR_OLD");
+  IElementType VAR_OLD_PREFIX = new SourcePawnElementType("VAR_OLD_PREFIX");
 
   IElementType AND = new SourcePawnTokenType("&");
   IElementType ANDAND = new SourcePawnTokenType("&&");
@@ -71,6 +65,7 @@ public interface SourcePawnTypes {
   IElementType EQEQ = new SourcePawnTokenType("==");
   IElementType EXCL = new SourcePawnTokenType("!");
   IElementType EXIT_KEYWORD = new SourcePawnTokenType("exit");
+  IElementType EXPR = new SourcePawnTokenType("expr");
   IElementType FLOAT_LITERAL = new SourcePawnTokenType("float_literal");
   IElementType FORWARD_KEYWORD = new SourcePawnTokenType("forward");
   IElementType FOR_KEYWORD = new SourcePawnTokenType("for");
@@ -78,7 +73,6 @@ public interface SourcePawnTypes {
   IElementType GT = new SourcePawnTokenType(">");
   IElementType GTGTEQ = new SourcePawnTokenType(">>=");
   IElementType HEX_LITERAL = new SourcePawnTokenType("hex_literal");
-  IElementType IDENTIFIER = new SourcePawnTokenType("identifier");
   IElementType IF_KEYWORD = new SourcePawnTokenType("if");
   IElementType INTEGER_LITERAL = new SourcePawnTokenType("integer_literal");
   IElementType LBRACE = new SourcePawnTokenType("{");
@@ -120,6 +114,7 @@ public interface SourcePawnTypes {
   IElementType STRING_LITERAL = new SourcePawnTokenType("string_literal");
   IElementType STRUCT_KEYWORD = new SourcePawnTokenType("struct");
   IElementType SWITCH_KEYWORD = new SourcePawnTokenType("switch");
+  IElementType SYMBOL = new SourcePawnTokenType("symbol");
   IElementType TAGOF_KEYWORD = new SourcePawnTokenType("tagof");
   IElementType TILDE = new SourcePawnTokenType("~");
   IElementType WHILE_KEYWORD = new SourcePawnTokenType("while");
@@ -129,104 +124,86 @@ public interface SourcePawnTypes {
   class Factory {
     public static PsiElement createElement(ASTNode node) {
       IElementType type = node.getElementType();
-       if (type == ANY_ASSIGN_OP) {
-        return new SourcePawnAnyAssignOpImpl(node);
+       if (type == ARGDECL) {
+        return new SourcePawnArgdeclImpl(node);
       }
-      else if (type == ARGDEF) {
-        return new SourcePawnArgdefImpl(node);
+      else if (type == ARG_INIT) {
+        return new SourcePawnArgInitImpl(node);
       }
-      else if (type == ARGDEF_DEFAULT) {
-        return new SourcePawnArgdefDefaultImpl(node);
+      else if (type == ARG_NEW) {
+        return new SourcePawnArgNewImpl(node);
       }
-      else if (type == ARRAY_DIMS) {
-        return new SourcePawnArrayDimsImpl(node);
+      else if (type == ARG_OLD) {
+        return new SourcePawnArgOldImpl(node);
       }
-      else if (type == ASSIGN_EXPR) {
-        return new SourcePawnAssignExprImpl(node);
+      else if (type == BUILTIN_TYPE) {
+        return new SourcePawnBuiltinTypeImpl(node);
       }
-      else if (type == ASSIGN_OP) {
-        return new SourcePawnAssignOpImpl(node);
+      else if (type == GLOBAL) {
+        return new SourcePawnGlobalImpl(node);
       }
-      else if (type == AUGMENTED_ASSIGN_OP) {
-        return new SourcePawnAugmentedAssignOpImpl(node);
+      else if (type == GLOBAL_ASSN) {
+        return new SourcePawnGlobalAssnImpl(node);
       }
-      else if (type == BLOCK_STATEMENT) {
-        return new SourcePawnBlockStatementImpl(node);
+      else if (type == GLOBAL_NEW) {
+        return new SourcePawnGlobalNewImpl(node);
       }
-      else if (type == COMPLEX_EXPRESSION) {
-        return new SourcePawnComplexExpressionImpl(node);
+      else if (type == GLOBAL_OLD) {
+        return new SourcePawnGlobalOldImpl(node);
       }
-      else if (type == DECL_EXPR) {
-        return new SourcePawnDeclExprImpl(node);
-      }
-      else if (type == ENUM_DECLARATION) {
-        return new SourcePawnEnumDeclarationImpl(node);
-      }
-      else if (type == ENUM_DECLARATION_LIST) {
-        return new SourcePawnEnumDeclarationListImpl(node);
-      }
-      else if (type == ENUM_DECLARATION_LIST_ITEM) {
-        return new SourcePawnEnumDeclarationListItemImpl(node);
-      }
-      else if (type == EXPRESSION) {
-        return new SourcePawnExpressionImpl(node);
-      }
-      else if (type == FORWARD_DECLARATION) {
-        return new SourcePawnForwardDeclarationImpl(node);
-      }
-      else if (type == FUNC_PROTO) {
-        return new SourcePawnFuncProtoImpl(node);
-      }
-      else if (type == GLOBAL_DECLARATION) {
-        return new SourcePawnGlobalDeclarationImpl(node);
-      }
-      else if (type == GLOBAL_STORAGE_TYPE) {
-        return new SourcePawnGlobalStorageTypeImpl(node);
-      }
-      else if (type == INITIALIZER) {
-        return new SourcePawnInitializerImpl(node);
+      else if (type == LABEL) {
+        return new SourcePawnLabelImpl(node);
       }
       else if (type == LITERAL) {
         return new SourcePawnLiteralImpl(node);
       }
-      else if (type == LOCAL_STORAGE_TYPE) {
-        return new SourcePawnLocalStorageTypeImpl(node);
-      }
-      else if (type == NATIVE_DECLARATION) {
-        return new SourcePawnNativeDeclarationImpl(node);
-      }
-      else if (type == NEW_EXPR) {
-        return new SourcePawnNewExprImpl(node);
+      else if (type == NEW_DIMS) {
+        return new SourcePawnNewDimsImpl(node);
       }
       else if (type == NUMBER) {
         return new SourcePawnNumberImpl(node);
       }
-      else if (type == SIMPLE_EXPRESSION) {
-        return new SourcePawnSimpleExpressionImpl(node);
+      else if (type == OLD_DIMS) {
+        return new SourcePawnOldDimsImpl(node);
       }
-      else if (type == SINGLE_STATEMENT) {
-        return new SourcePawnSingleStatementImpl(node);
+      else if (type == RETURN_NEW) {
+        return new SourcePawnReturnNewImpl(node);
       }
-      else if (type == STATEMENT) {
-        return new SourcePawnStatementImpl(node);
+      else if (type == RETURN_OLD) {
+        return new SourcePawnReturnOldImpl(node);
       }
-      else if (type == STRUCT_INITIALIZER) {
-        return new SourcePawnStructInitializerImpl(node);
+      else if (type == RETURN_TYPE) {
+        return new SourcePawnReturnTypeImpl(node);
       }
-      else if (type == STRUCT_INITIALIZER_ITEM) {
-        return new SourcePawnStructInitializerItemImpl(node);
+      else if (type == STORAGE_CLASS) {
+        return new SourcePawnStorageClassImpl(node);
       }
       else if (type == TAG) {
         return new SourcePawnTagImpl(node);
       }
-      else if (type == TAGGED_IDENTIFIER) {
-        return new SourcePawnTaggedIdentifierImpl(node);
+      else if (type == TAGS) {
+        return new SourcePawnTagsImpl(node);
       }
-      else if (type == TOP_LEVEL_STATEMENT) {
-        return new SourcePawnTopLevelStatementImpl(node);
+      else if (type == TAG_VECTOR) {
+        return new SourcePawnTagVectorImpl(node);
       }
-      else if (type == TOP_LEVEL_STATEMENT_ITEM) {
-        return new SourcePawnTopLevelStatementItemImpl(node);
+      else if (type == TYPE_EXPR) {
+        return new SourcePawnTypeExprImpl(node);
+      }
+      else if (type == VARDECL) {
+        return new SourcePawnVardeclImpl(node);
+      }
+      else if (type == VAR_NEW) {
+        return new SourcePawnVarNewImpl(node);
+      }
+      else if (type == VAR_NEW_PREFIX) {
+        return new SourcePawnVarNewPrefixImpl(node);
+      }
+      else if (type == VAR_OLD) {
+        return new SourcePawnVarOldImpl(node);
+      }
+      else if (type == VAR_OLD_PREFIX) {
+        return new SourcePawnVarOldPrefixImpl(node);
       }
       throw new AssertionError("Unknown element type: " + type);
     }

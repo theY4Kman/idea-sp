@@ -5,15 +5,15 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface SourcePawnNumber extends PsiElement {
+public interface SourcePawnTypeExpr extends PsiElement {
 
   @Nullable
-  PsiElement getFloatLiteral();
+  SourcePawnBuiltinType getBuiltinType();
 
   @Nullable
-  PsiElement getHexLiteral();
+  SourcePawnNewDims getNewDims();
 
   @Nullable
-  PsiElement getIntegerLiteral();
+  PsiElement getSymbol();
 
 }

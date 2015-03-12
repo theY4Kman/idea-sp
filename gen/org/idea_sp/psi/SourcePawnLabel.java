@@ -5,9 +5,9 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface SourcePawnTag extends PsiElement {
+public interface SourcePawnLabel extends PsiElement {
 
   @NotNull
-  SourcePawnLabel getLabel();
+  PsiElement getSymbol();
 
 }

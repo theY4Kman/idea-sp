@@ -7,79 +7,43 @@ import com.intellij.psi.PsiElement;
 
 public class SourcePawnVisitor extends PsiElementVisitor {
 
-  public void visitAssignOp(@NotNull SourcePawnAssignOp o) {
+  public void visitArgInit(@NotNull SourcePawnArgInit o) {
     visitPsiElement(o);
   }
 
-  public void visitAugmentedAssignOp(@NotNull SourcePawnAugmentedAssignOp o) {
+  public void visitArgNew(@NotNull SourcePawnArgNew o) {
     visitPsiElement(o);
   }
 
-  public void visitAnyAssignOp(@NotNull SourcePawnAnyAssignOp o) {
+  public void visitArgOld(@NotNull SourcePawnArgOld o) {
     visitPsiElement(o);
   }
 
-  public void visitArgdef(@NotNull SourcePawnArgdef o) {
+  public void visitArgdecl(@NotNull SourcePawnArgdecl o) {
     visitPsiElement(o);
   }
 
-  public void visitArgdefDefault(@NotNull SourcePawnArgdefDefault o) {
+  public void visitBuiltinType(@NotNull SourcePawnBuiltinType o) {
     visitPsiElement(o);
   }
 
-  public void visitArrayDims(@NotNull SourcePawnArrayDims o) {
+  public void visitGlobal(@NotNull SourcePawnGlobal o) {
     visitPsiElement(o);
   }
 
-  public void visitAssignExpr(@NotNull SourcePawnAssignExpr o) {
+  public void visitGlobalAssn(@NotNull SourcePawnGlobalAssn o) {
     visitPsiElement(o);
   }
 
-  public void visitBlockStatement(@NotNull SourcePawnBlockStatement o) {
+  public void visitGlobalNew(@NotNull SourcePawnGlobalNew o) {
     visitPsiElement(o);
   }
 
-  public void visitComplexExpression(@NotNull SourcePawnComplexExpression o) {
+  public void visitGlobalOld(@NotNull SourcePawnGlobalOld o) {
     visitPsiElement(o);
   }
 
-  public void visitDeclExpr(@NotNull SourcePawnDeclExpr o) {
-    visitPsiElement(o);
-  }
-
-  public void visitEnumDeclaration(@NotNull SourcePawnEnumDeclaration o) {
-    visitPsiElement(o);
-  }
-
-  public void visitEnumDeclarationList(@NotNull SourcePawnEnumDeclarationList o) {
-    visitPsiElement(o);
-  }
-
-  public void visitEnumDeclarationListItem(@NotNull SourcePawnEnumDeclarationListItem o) {
-    visitPsiElement(o);
-  }
-
-  public void visitExpression(@NotNull SourcePawnExpression o) {
-    visitPsiElement(o);
-  }
-
-  public void visitForwardDeclaration(@NotNull SourcePawnForwardDeclaration o) {
-    visitPsiElement(o);
-  }
-
-  public void visitFuncProto(@NotNull SourcePawnFuncProto o) {
-    visitPsiElement(o);
-  }
-
-  public void visitGlobalDeclaration(@NotNull SourcePawnGlobalDeclaration o) {
-    visitPsiElement(o);
-  }
-
-  public void visitGlobalStorageType(@NotNull SourcePawnGlobalStorageType o) {
-    visitPsiElement(o);
-  }
-
-  public void visitInitializer(@NotNull SourcePawnInitializer o) {
+  public void visitLabel(@NotNull SourcePawnLabel o) {
     visitPsiElement(o);
   }
 
@@ -87,15 +51,7 @@ public class SourcePawnVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
-  public void visitLocalStorageType(@NotNull SourcePawnLocalStorageType o) {
-    visitPsiElement(o);
-  }
-
-  public void visitNativeDeclaration(@NotNull SourcePawnNativeDeclaration o) {
-    visitPsiElement(o);
-  }
-
-  public void visitNewExpr(@NotNull SourcePawnNewExpr o) {
+  public void visitNewDims(@NotNull SourcePawnNewDims o) {
     visitPsiElement(o);
   }
 
@@ -103,23 +59,23 @@ public class SourcePawnVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
-  public void visitSimpleExpression(@NotNull SourcePawnSimpleExpression o) {
+  public void visitOldDims(@NotNull SourcePawnOldDims o) {
     visitPsiElement(o);
   }
 
-  public void visitSingleStatement(@NotNull SourcePawnSingleStatement o) {
+  public void visitReturnNew(@NotNull SourcePawnReturnNew o) {
     visitPsiElement(o);
   }
 
-  public void visitStatement(@NotNull SourcePawnStatement o) {
+  public void visitReturnOld(@NotNull SourcePawnReturnOld o) {
     visitPsiElement(o);
   }
 
-  public void visitStructInitializer(@NotNull SourcePawnStructInitializer o) {
+  public void visitReturnType(@NotNull SourcePawnReturnType o) {
     visitPsiElement(o);
   }
 
-  public void visitStructInitializerItem(@NotNull SourcePawnStructInitializerItem o) {
+  public void visitStorageClass(@NotNull SourcePawnStorageClass o) {
     visitPsiElement(o);
   }
 
@@ -127,15 +83,35 @@ public class SourcePawnVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
-  public void visitTaggedIdentifier(@NotNull SourcePawnTaggedIdentifier o) {
+  public void visitTagVector(@NotNull SourcePawnTagVector o) {
     visitPsiElement(o);
   }
 
-  public void visitTopLevelStatement(@NotNull SourcePawnTopLevelStatement o) {
+  public void visitTags(@NotNull SourcePawnTags o) {
     visitPsiElement(o);
   }
 
-  public void visitTopLevelStatementItem(@NotNull SourcePawnTopLevelStatementItem o) {
+  public void visitTypeExpr(@NotNull SourcePawnTypeExpr o) {
+    visitPsiElement(o);
+  }
+
+  public void visitVarNew(@NotNull SourcePawnVarNew o) {
+    visitPsiElement(o);
+  }
+
+  public void visitVarNewPrefix(@NotNull SourcePawnVarNewPrefix o) {
+    visitPsiElement(o);
+  }
+
+  public void visitVarOld(@NotNull SourcePawnVarOld o) {
+    visitPsiElement(o);
+  }
+
+  public void visitVarOldPrefix(@NotNull SourcePawnVarOldPrefix o) {
+    visitPsiElement(o);
+  }
+
+  public void visitVardecl(@NotNull SourcePawnVardecl o) {
     visitPsiElement(o);
   }
 

@@ -11,21 +11,15 @@ import static org.idea_sp.psi.SourcePawnTypes.*;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import org.idea_sp.psi.*;
 
-public class SourcePawnTagImpl extends ASTWrapperPsiElement implements SourcePawnTag {
+public class SourcePawnStorageClassImpl extends ASTWrapperPsiElement implements SourcePawnStorageClass {
 
-  public SourcePawnTagImpl(ASTNode node) {
+  public SourcePawnStorageClassImpl(ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof SourcePawnVisitor) ((SourcePawnVisitor)visitor).visitTag(this);
+    if (visitor instanceof SourcePawnVisitor) ((SourcePawnVisitor)visitor).visitStorageClass(this);
     else super.accept(visitor);
-  }
-
-  @Override
-  @NotNull
-  public SourcePawnLabel getLabel() {
-    return findNotNullChildByClass(SourcePawnLabel.class);
   }
 
 }
