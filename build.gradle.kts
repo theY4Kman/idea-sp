@@ -28,11 +28,14 @@ tasks.getByName<org.jetbrains.intellij.tasks.PatchPluginXmlTask>("patchPluginXml
 sourceSets.getByName("main") {
     java.srcDir("src/main/java")
     java.srcDir("src/main/kotlin")
+    java.srcDir("src/main/gen")
     java.srcDir("gen")
 }
 
 idea {
     module {
+        // TODO: Use the same output directory for Parser and lexer
         generatedSourceDirs.add(file("gen"))
+        generatedSourceDirs.add(file("src/main/gen"))
     }
 }
