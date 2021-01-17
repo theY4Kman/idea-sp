@@ -5,7 +5,7 @@ import com.intellij.openapi.fileTypes.FileTypeFactory
 
 class SourcePawnFileTypeFactory : FileTypeFactory() {
     override fun createFileTypes(consumer: FileTypeConsumer) {
-        consumer.consume(SourcePawnFileType.INSTANCE, "sp");
-        consumer.consume(SourcePawnFileType.INSTANCE, "inc");
+        consumer.consume(SourcePawnFileType, "sp");
+        consumer.consume(SourcePawnFileType, "inc");
     }
 }
