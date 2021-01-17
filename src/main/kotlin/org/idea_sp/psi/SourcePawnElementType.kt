@@ -1,12 +1,10 @@
-package org.idea_sp.psi;
+package org.idea_sp.psi
 
-import com.intellij.psi.tree.IElementType;
-import org.idea_sp.SourcePawnLanguage;
-import org.jetbrains.annotations.NonNls;
-import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.NonNls
+import com.intellij.psi.tree.IElementType
+import org.idea_sp.SourcePawnLanguage
+import com.intellij.psi.FileViewProvider
+import com.intellij.extapi.psi.PsiFileBase
+import org.idea_sp.SourcePawnFileType
 
-public class SourcePawnElementType extends IElementType {
-    public SourcePawnElementType(@NotNull @NonNls String debugName) {
-        super(debugName, SourcePawnLanguage.INSTANCE);
-    }
-}
+class SourcePawnElementType(@NonNls debugName: String) : IElementType(debugName, SourcePawnLanguage)
