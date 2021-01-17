@@ -124,7 +124,7 @@ public interface SourcePawnTypes {
   class Factory {
     public static PsiElement createElement(ASTNode node) {
       IElementType type = node.getElementType();
-       if (type == ARGDECL) {
+      if (type == ARGDECL) {
         return new SourcePawnArgdeclImpl(node);
       }
       else if (type == ARG_INIT) {

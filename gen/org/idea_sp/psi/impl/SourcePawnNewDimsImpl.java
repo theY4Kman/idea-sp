@@ -13,12 +13,17 @@ import org.idea_sp.psi.*;
 
 public class SourcePawnNewDimsImpl extends ASTWrapperPsiElement implements SourcePawnNewDims {
 
-  public SourcePawnNewDimsImpl(ASTNode node) {
+  public SourcePawnNewDimsImpl(@NotNull ASTNode node) {
     super(node);
   }
 
+  public void accept(@NotNull SourcePawnVisitor visitor) {
+    visitor.visitNewDims(this);
+  }
+
+  @Override
   public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof SourcePawnVisitor) ((SourcePawnVisitor)visitor).visitNewDims(this);
+    if (visitor instanceof SourcePawnVisitor) accept((SourcePawnVisitor)visitor);
     else super.accept(visitor);
   }
 

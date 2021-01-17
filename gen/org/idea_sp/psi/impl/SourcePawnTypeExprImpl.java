@@ -13,12 +13,17 @@ import org.idea_sp.psi.*;
 
 public class SourcePawnTypeExprImpl extends ASTWrapperPsiElement implements SourcePawnTypeExpr {
 
-  public SourcePawnTypeExprImpl(ASTNode node) {
+  public SourcePawnTypeExprImpl(@NotNull ASTNode node) {
     super(node);
   }
 
+  public void accept(@NotNull SourcePawnVisitor visitor) {
+    visitor.visitTypeExpr(this);
+  }
+
+  @Override
   public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof SourcePawnVisitor) ((SourcePawnVisitor)visitor).visitTypeExpr(this);
+    if (visitor instanceof SourcePawnVisitor) accept((SourcePawnVisitor)visitor);
     else super.accept(visitor);
   }
 

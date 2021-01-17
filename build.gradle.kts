@@ -1,6 +1,7 @@
 plugins {
     id("org.jetbrains.intellij") version "0.6.5"
     java
+    idea
 }
 
 group = "org.idea_sp"
@@ -27,6 +28,11 @@ tasks.getByName<org.jetbrains.intellij.tasks.PatchPluginXmlTask>("patchPluginXml
 sourceSets.getByName("main") {
     java.srcDir("src/main/java")
     java.srcDir("src/main/kotlin")
-    java.srcDir("src/main/grammar")
-    java.srcDir("src/main/gen")
+    java.srcDir("gen")
+}
+
+idea {
+    module {
+        generatedSourceDirs.add(file("gen"))
+    }
 }

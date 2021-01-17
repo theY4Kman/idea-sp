@@ -13,12 +13,17 @@ import org.idea_sp.psi.*;
 
 public class SourcePawnBuiltinTypeImpl extends ASTWrapperPsiElement implements SourcePawnBuiltinType {
 
-  public SourcePawnBuiltinTypeImpl(ASTNode node) {
+  public SourcePawnBuiltinTypeImpl(@NotNull ASTNode node) {
     super(node);
   }
 
+  public void accept(@NotNull SourcePawnVisitor visitor) {
+    visitor.visitBuiltinType(this);
+  }
+
+  @Override
   public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof SourcePawnVisitor) ((SourcePawnVisitor)visitor).visitBuiltinType(this);
+    if (visitor instanceof SourcePawnVisitor) accept((SourcePawnVisitor)visitor);
     else super.accept(visitor);
   }
 

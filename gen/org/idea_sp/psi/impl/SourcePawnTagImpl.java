@@ -13,12 +13,17 @@ import org.idea_sp.psi.*;
 
 public class SourcePawnTagImpl extends ASTWrapperPsiElement implements SourcePawnTag {
 
-  public SourcePawnTagImpl(ASTNode node) {
+  public SourcePawnTagImpl(@NotNull ASTNode node) {
     super(node);
   }
 
+  public void accept(@NotNull SourcePawnVisitor visitor) {
+    visitor.visitTag(this);
+  }
+
+  @Override
   public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof SourcePawnVisitor) ((SourcePawnVisitor)visitor).visitTag(this);
+    if (visitor instanceof SourcePawnVisitor) accept((SourcePawnVisitor)visitor);
     else super.accept(visitor);
   }
 

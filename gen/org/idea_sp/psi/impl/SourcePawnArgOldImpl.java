@@ -13,12 +13,17 @@ import org.idea_sp.psi.*;
 
 public class SourcePawnArgOldImpl extends ASTWrapperPsiElement implements SourcePawnArgOld {
 
-  public SourcePawnArgOldImpl(ASTNode node) {
+  public SourcePawnArgOldImpl(@NotNull ASTNode node) {
     super(node);
   }
 
+  public void accept(@NotNull SourcePawnVisitor visitor) {
+    visitor.visitArgOld(this);
+  }
+
+  @Override
   public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof SourcePawnVisitor) ((SourcePawnVisitor)visitor).visitArgOld(this);
+    if (visitor instanceof SourcePawnVisitor) accept((SourcePawnVisitor)visitor);
     else super.accept(visitor);
   }
 

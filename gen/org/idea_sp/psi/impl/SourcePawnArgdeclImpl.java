@@ -13,12 +13,17 @@ import org.idea_sp.psi.*;
 
 public class SourcePawnArgdeclImpl extends ASTWrapperPsiElement implements SourcePawnArgdecl {
 
-  public SourcePawnArgdeclImpl(ASTNode node) {
+  public SourcePawnArgdeclImpl(@NotNull ASTNode node) {
     super(node);
   }
 
+  public void accept(@NotNull SourcePawnVisitor visitor) {
+    visitor.visitArgdecl(this);
+  }
+
+  @Override
   public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof SourcePawnVisitor) ((SourcePawnVisitor)visitor).visitArgdecl(this);
+    if (visitor instanceof SourcePawnVisitor) accept((SourcePawnVisitor)visitor);
     else super.accept(visitor);
   }
 

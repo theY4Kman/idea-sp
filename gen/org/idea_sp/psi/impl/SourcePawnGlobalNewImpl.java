@@ -13,12 +13,17 @@ import org.idea_sp.psi.*;
 
 public class SourcePawnGlobalNewImpl extends ASTWrapperPsiElement implements SourcePawnGlobalNew {
 
-  public SourcePawnGlobalNewImpl(ASTNode node) {
+  public SourcePawnGlobalNewImpl(@NotNull ASTNode node) {
     super(node);
   }
 
+  public void accept(@NotNull SourcePawnVisitor visitor) {
+    visitor.visitGlobalNew(this);
+  }
+
+  @Override
   public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof SourcePawnVisitor) ((SourcePawnVisitor)visitor).visitGlobalNew(this);
+    if (visitor instanceof SourcePawnVisitor) accept((SourcePawnVisitor)visitor);
     else super.accept(visitor);
   }
 
