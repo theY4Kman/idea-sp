@@ -1,5 +1,4 @@
 .DS_Store
-META-INF/
 out/
 
 # Reference: https://github.com/github/gitignore/blob/master/Global/JetBrains.gitignore
@@ -26,3 +25,6 @@ out/
 .idea/**/libraries
 
 .gradle
+
+# Sandbox
+build
