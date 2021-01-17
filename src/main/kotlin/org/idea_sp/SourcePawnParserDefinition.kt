@@ -1,74 +1,68 @@
-package org.idea_sp;
+package org.idea_sp
 
+import com.intellij.lang.ASTNode
+import com.intellij.lang.ParserDefinition
+import com.intellij.lang.ParserDefinition.SpaceRequirements
+import com.intellij.lang.PsiParser
+import com.intellij.lexer.FlexAdapter
+import com.intellij.lexer.Lexer
+import com.intellij.openapi.project.Project
+import com.intellij.psi.FileViewProvider
+import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiFile
+import com.intellij.psi.TokenType
+import com.intellij.psi.tree.IFileElementType
+import com.intellij.psi.tree.TokenSet
+import org.idea_sp.parser.SourcePawnParser
+import org.idea_sp.psi.SourcePawnFile
+import org.idea_sp.psi.SourcePawnTypes
+import java.io.Reader
 
-import com.intellij.lang.ASTNode;
-import com.intellij.lang.Language;
-import com.intellij.lang.ParserDefinition;
-import com.intellij.lang.PsiParser;
-import com.intellij.lexer.FlexAdapter;
-import com.intellij.lexer.Lexer;
-import com.intellij.openapi.project.Project;
-import com.intellij.psi.FileViewProvider;
-import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiFile;
-import com.intellij.psi.TokenType;
-import com.intellij.psi.tree.IFileElementType;
-import com.intellij.psi.tree.TokenSet;
-import org.idea_sp.parser.SourcePawnParser;
-import org.idea_sp.psi.SourcePawnFile;
-import org.idea_sp.psi.SourcePawnTypes;
-import org.jetbrains.annotations.NotNull;
+class SourcePawnParserDefinition : ParserDefinition {
+    override fun createLexer(project: Project): Lexer {
+        return FlexAdapter(_SourcePawnLexer(null as Reader?))
+    }
 
-import java.io.Reader;
+    override fun getWhitespaceTokens(): TokenSet {
+        return WHITE_SPACES
+    }
 
-public class SourcePawnParserDefinition implements ParserDefinition {
-    public static final TokenSet WHITE_SPACES = TokenSet.create(TokenType.WHITE_SPACE);
-    public static final TokenSet COMMENTS = TokenSet.create(SourcePawnTypes.LINE_COMMENT, SourcePawnTypes.BLOCK_COMMENT, SourcePawnTypes.PREPROCESSOR_COMMENT);
-    public static final TokenSet STRING_LITERALS = TokenSet.create(SourcePawnTypes.STRING_LITERAL, SourcePawnTypes.CHARACTER_LITERAL);
+    override fun getCommentTokens(): TokenSet {
+        return COMMENTS
+    }
 
-    public static final IFileElementType FILE = new IFileElementType(Language.<SourcePawnLanguage>findInstance(SourcePawnLanguage.class));
- 
-    @NotNull
-    @Override
-    public Lexer createLexer(Project project) {
-        return new FlexAdapter(new _SourcePawnLexer((Reader) null));
+    override fun getStringLiteralElements(): TokenSet {
+        return STRING_LITERALS
     }
- 
-    @NotNull
-    public TokenSet getWhitespaceTokens() {
-        return WHITE_SPACES;
+
+    override fun createParser(project: Project): PsiParser {
+        return SourcePawnParser()
     }
- 
-    @NotNull
-    public TokenSet getCommentTokens() {
-        return COMMENTS;
+
+    override fun getFileNodeType(): IFileElementType {
+        return FILE
     }
- 
-    @NotNull
-    public TokenSet getStringLiteralElements() {
-        return STRING_LITERALS;
+
+    override fun createFile(viewProvider: FileViewProvider): PsiFile {
+        return SourcePawnFile(viewProvider)
     }
- 
-    @NotNull
-    public PsiParser createParser(final Project project) {
-        return new SourcePawnParser();
+
+    override fun spaceExistanceTypeBetweenTokens(left: ASTNode, right: ASTNode): SpaceRequirements {
+        return SpaceRequirements.MAY
     }
- 
-    @Override
-    public IFileElementType getFileNodeType() {
-        return FILE;
+
+    override fun createElement(node: ASTNode): PsiElement {
+        return SourcePawnTypes.Factory.createElement(node)
     }
- 
-    public PsiFile createFile(FileViewProvider viewProvider) {
-        return new SourcePawnFile(viewProvider);
-    }
- 
-    public SpaceRequirements spaceExistanceTypeBetweenTokens(ASTNode left, ASTNode right) {
-        return SpaceRequirements.MAY;
-    }
- 
-    @NotNull
-    public PsiElement createElement(ASTNode node) {
-        return SourcePawnTypes.Factory.createElement(node);
+
+    companion object {
+        val WHITE_SPACES = TokenSet.create(TokenType.WHITE_SPACE)
+        val COMMENTS = TokenSet.create(
+            SourcePawnTypes.LINE_COMMENT,
+            SourcePawnTypes.BLOCK_COMMENT,
+            SourcePawnTypes.PREPROCESSOR_COMMENT
+        )
+        val STRING_LITERALS = TokenSet.create(SourcePawnTypes.STRING_LITERAL, SourcePawnTypes.CHARACTER_LITERAL)
+        val FILE = IFileElementType(SourcePawnLanguage)
     }
 }

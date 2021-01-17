@@ -1,47 +1,47 @@
-package org.idea_sp;
+package org.idea_sp
 
-import com.intellij.psi.tree.TokenSet;
+import com.intellij.psi.tree.TokenSet
+import org.idea_sp.psi.SourcePawnTypes
 
-import static org.idea_sp.psi.SourcePawnTypes.*;
-
-public interface SourcePawnTokenTypeSets {
-    TokenSet COMMENTS = TokenSet.create(
-            LINE_COMMENT,
-            BLOCK_COMMENT,
-            PREPROCESSOR_COMMENT
-    );
-
-    TokenSet KEYWORDS = TokenSet.create(
-            ASSERT_KEYWORD,
-            BREAK_KEYWORD,
-            CASE_KEYWORD,
-            CONTINUE_KEYWORD,
-            DEFAULT_KEYWORD,
-            DO_KEYWORD,
-            ELSE_KEYWORD,
-            EXIT_KEYWORD,
-            FOR_KEYWORD,
-            GOTO_KEYWORD,
-            IF_KEYWORD,
-            RETURN_KEYWORD,
-            SLEEP_KEYWORD,
-            STATE_KEYWORD,
-            SWITCH_KEYWORD,
-            WHILE_KEYWORD,
-            DEFINED_KEYWORD,
-            SIZEOF_KEYWORD,
-            STATE_KEYWORD,
-            TAGOF_KEYWORD,
-            CONST_KEYWORD,
-            FORWARD_KEYWORD,
-            NATIVE_KEYWORD,
-            NEW_KEYWORD,
-            OPERATOR_KEYWORD,
-            PUBLIC_KEYWORD,
-            STATIC_KEYWORD,
-            STOCK_KEYWORD,
-            DECL_KEYWORD,
-            NEW_KEYWORD,
-            PUBLIC_KEYWORD
-    );
+interface SourcePawnTokenTypeSets {
+    companion object {
+        val COMMENTS = TokenSet.create(
+            SourcePawnTypes.LINE_COMMENT,
+            SourcePawnTypes.BLOCK_COMMENT,
+            SourcePawnTypes.PREPROCESSOR_COMMENT
+        )
+        val KEYWORDS = TokenSet.create(
+            SourcePawnTypes.ASSERT_KEYWORD,
+            SourcePawnTypes.BREAK_KEYWORD,
+            SourcePawnTypes.CASE_KEYWORD,
+            SourcePawnTypes.CONTINUE_KEYWORD,
+            SourcePawnTypes.DEFAULT_KEYWORD,
+            SourcePawnTypes.DO_KEYWORD,
+            SourcePawnTypes.ELSE_KEYWORD,
+            SourcePawnTypes.EXIT_KEYWORD,
+            SourcePawnTypes.FOR_KEYWORD,
+            SourcePawnTypes.GOTO_KEYWORD,
+            SourcePawnTypes.IF_KEYWORD,
+            SourcePawnTypes.RETURN_KEYWORD,
+            SourcePawnTypes.SLEEP_KEYWORD,
+            SourcePawnTypes.STATE_KEYWORD,
+            SourcePawnTypes.SWITCH_KEYWORD,
+            SourcePawnTypes.WHILE_KEYWORD,
+            SourcePawnTypes.DEFINED_KEYWORD,
+            SourcePawnTypes.SIZEOF_KEYWORD,
+            SourcePawnTypes.STATE_KEYWORD,
+            SourcePawnTypes.TAGOF_KEYWORD,
+            SourcePawnTypes.CONST_KEYWORD,
+            SourcePawnTypes.FORWARD_KEYWORD,
+            SourcePawnTypes.NATIVE_KEYWORD,
+            SourcePawnTypes.NEW_KEYWORD,
+            SourcePawnTypes.OPERATOR_KEYWORD,
+            SourcePawnTypes.PUBLIC_KEYWORD,
+            SourcePawnTypes.STATIC_KEYWORD,
+            SourcePawnTypes.STOCK_KEYWORD,
+            SourcePawnTypes.DECL_KEYWORD,
+            SourcePawnTypes.NEW_KEYWORD,
+            SourcePawnTypes.PUBLIC_KEYWORD
+        )
+    }
 }

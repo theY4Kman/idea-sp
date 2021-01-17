@@ -1,11 +1,7 @@
-package org.idea_sp;
+package org.idea_sp
 
-import com.intellij.lexer.FlexAdapter;
+import com.intellij.lexer.FlexAdapter
+import org.idea_sp._SourcePawnLexer
+import java.io.Reader
 
-import java.io.Reader;
-
-public class SourcePawnLexerAdapter extends FlexAdapter {
-    public SourcePawnLexerAdapter() {
-        super(new _SourcePawnLexer((Reader) null));
-    }
-}
+class SourcePawnLexerAdapter : FlexAdapter(_SourcePawnLexer(null))
