@@ -6,8 +6,8 @@ import com.intellij.openapi.editor.DefaultLanguageHighlighterColors
 import com.intellij.openapi.editor.colors.TextAttributesKey
 import com.intellij.openapi.fileTypes.SyntaxHighlighterBase
 import com.intellij.psi.tree.IElementType
-import org.idea_sp.SourcePawnTokenTypeSets.COMMENTS
-import org.idea_sp.SourcePawnTokenTypeSets.KEYWORDS
+import org.idea_sp.SourcePawnTokenTypeSets.Companion.COMMENTS
+import org.idea_sp.SourcePawnTokenTypeSets.Companion.KEYWORDS
 import org.idea_sp.psi.SourcePawnTypes
 
 class SourcePawnSyntaxHighlighter : SyntaxHighlighterBase() {
