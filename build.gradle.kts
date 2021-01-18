@@ -27,6 +27,7 @@ sourceSets.getByName("main") {
     java.srcDir("src/main/java")
     java.srcDir("src/main/kotlin")
     java.srcDir("src/main/gen")
+    java.srcDir("src/main/grammar")
 }
 
 idea {
