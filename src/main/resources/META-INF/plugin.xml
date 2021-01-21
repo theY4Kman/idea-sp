@@ -1,0 +1,28 @@
+<idea-plugin>
+    <id>org.idea_sp</id>
+    <name>IDEA SourcePawn</name>
+    <vendor email="" url=""> </vendor>
+
+    <description>SourcePawn Language support for Intellij IDEA</description>
+
+    <!-- please see https://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
+         on how to target different products -->
+    <depends>com.intellij.modules.platform</depends>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <!-- TODO: Replace fileTypeFactory with fileType -->
+        <fileTypeFactory implementation="org.idea_sp.SourcePawnFileTypeFactory"/>
+        <lang.parserDefinition language="SourcePawn"
+                               implementationClass="org.idea_sp.SourcePawnParserDefinition"/>
+
+        <!-- TODO: Replace syntaxHighlighterFactory with syntaxHighlighter -->
+        <lang.syntaxHighlighterFactory language="SourcePawn"
+                                implementationClass="org.idea_sp.SourcePawnSyntaxHighlighterFactory"/>
+        <colorSettingsPage implementation="org.idea_sp.SourcePawnColorSettingsPage"/>
+
+    </extensions>
+
+    <actions>
+        <!-- Add your actions here -->
+    </actions>
+</idea-plugin>
