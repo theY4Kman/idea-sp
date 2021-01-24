@@ -21,6 +21,8 @@ repositories {
 // See https://github.com/JetBrains/gradle-intellij-plugin/
 intellij {
     version = "2020.3.1"
+
+    setPlugins("PsiViewer:203-SNAPSHOT")
 }
 
 sourceSets.getByName("main") {
