@@ -5,18 +5,24 @@ import static org.idea_sp.psi.SourcePawnTypes.*;
 
 %%
 
-%{
-  public _SourcePawnLexer() {
-    this((java.io.Reader)null);
-  }
-%}
-
 %public
 %class _SourcePawnLexer
 %implements FlexLexer
 %function advance
 %type IElementType
 %unicode
+%line
+%column
+
+%{
+  public _SourcePawnLexer() {
+    this((java.io.Reader)null);
+  }
+
+  int yyline;
+  int yycolumn;
+  int commentStart;
+%}
 
 EOL="\r"|"\n"|"\r\n"
 LINE_WS=[\ \t\f]
@@ -24,7 +30,9 @@ WHITE_SPACE=({LINE_WS}|{EOL})+
 
 SPACE=[\ \n\r\t\f]
 LINE_COMMENT="//"[^\r\n]*
-BLOCK_COMMENT="/"\*(.|\n)*?\*"/"
+BLOCK_COMMENT=[\s\S]
+BLOCK_COMMENT_START="/*"
+BLOCK_COMMENT_END="*/"
 PREPROCESSOR_COMMENT=#(assert|define|else|elseif|endif|endinput|error|file|if|include|line|pragma|section|tryinclude|undef)[^\r\n]*
 INTEGER_LITERAL=[-+]?[0-9][_\d]*
 FLOAT_LITERAL=[-+]?[0-9][_\d]*\.[0-9][_\d]*(e[-+]?[0-9]+)?
@@ -34,8 +42,20 @@ STRING_LITERAL=\"(\\.|[^\"])*\"
 CHARACTER_LITERAL='(\\.|[^\"])'
 SYMBOL=([@_a-zA-Z][@_a-zA-Z0-9]+|[a-zA-Z][@_a-zA-Z0-9]*)
 
+%state COMMENT
+
 %%
+<COMMENT> {
+  {BLOCK_COMMENT_END}         { yybegin(YYINITIAL);
+                                zzStartRead = commentStart;
+                                return BLOCK_COMMENT; }
+  [\s\S]                      { }
+}
+
 <YYINITIAL> {
+  {BLOCK_COMMENT_START}       { commentStart = zzStartRead;
+                                yybegin(COMMENT); }
+
   {WHITE_SPACE}               { return com.intellij.psi.TokenType.WHITE_SPACE; }
 
   "="                         { return EQ; }
@@ -111,11 +131,16 @@ SYMBOL=([@_a-zA-Z][@_a-zA-Z0-9]+|[a-zA-Z][@_a-zA-Z0-9]*)
   "decl"                      { return DECL_KEYWORD; }
   "enum"                      { return ENUM_KEYWORD; }
   "struct"                    { return STRUCT_KEYWORD; }
+  "void"                      { return VOID_TYPE; }
+  "int"                       { return INT_TYPE; }
+  "float"                     { return FLOAT_TYPE; }
+  "char"                      { return CHAR_TYPE; }
+  "bool"                      { return BOOL_TYPE; }
   "expr"                      { return EXPR; }
+  "view_as"                   { return VIEW_AS_KEYWORD; }
 
   {SPACE}                     { return SPACE; }
   {LINE_COMMENT}              { return LINE_COMMENT; }
-  {BLOCK_COMMENT}             { return BLOCK_COMMENT; }
   {PREPROCESSOR_COMMENT}      { return PREPROCESSOR_COMMENT; }
   {INTEGER_LITERAL}           { return INTEGER_LITERAL; }
   {FLOAT_LITERAL}             { return FLOAT_LITERAL; }

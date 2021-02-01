@@ -3,6 +3,9 @@
   parserClass="org.idea_sp.parser.SourcePawnParser"
 
   extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
+  extends(".*_expr")=expr
+
+  consumeTokenMethod(".*_expr|expr")="consumeTokenFast"
 
   psiClassPrefix="SourcePawn"
   psiImplClassSuffix="Impl"
@@ -97,8 +100,13 @@
     ENUM_KEYWORD="enum"
     STRUCT_KEYWORD="struct"
 
-    // TODO: remove me (for live preview purposes only)
-    SPACE="regexp:[\ \n\r\t\f]"
+    VIEW_AS_KEYWORD="view_as"
+
+    VOID_TYPE="void"
+    INT_TYPE="int"
+    FLOAT_TYPE="float"
+    CHAR_TYPE="char"
+    BOOL_TYPE="bool"
 
     line_comment="regexp://[^\r\n]*"
     block_comment="regexp:/\*(.|\n)*?\*/"
@@ -115,61 +123,172 @@
     // @ and _ are not themselves valid identifiers.
     identifier="regexp:([@_a-zA-Z][@_a-zA-Z0-9]+|[a-zA-Z][@_a-zA-Z0-9]*)"
 
-
-    // xxx///////////////
-    // Below is from an attempt to use dvander's grammar as a base
-    // See https://wiki.alliedmods.net/SourcePawn_Transitional_Syntax#Grammar
-
-    // This is dvander's symbol. It doesn't handle all the edge cases Pawn allows
-//    symbol="regexp:[A-Za-z_]([A-Za-z0-9_@]*)"
     symbol="regexp:([@_a-zA-Z][@_a-zA-Z0-9]+|[a-zA-Z][@_a-zA-Z0-9]*)"
+
+    // TODO: remove me (for live preview purposes only)
+    SPACE="regexp:[ \n\r\t\f]"
   ]
 }
 
+private root ::= global
 
-root ::= root_item *
-private root_item ::= global_assn SEMICOLON
+private meta list ::= <<param>> ( COMMA <<param>> )*
 
+private global ::= global_var_decl_statement
+                 | func
 
-global_assn ::= global '=' literal
+global_var_decl_statement ::= global_var_decl SEMICOLON
+                            | global_var_decl EQ global_var_initializer SEMICOLON
 
+global_var_decl ::= global_var_storage_class? type_decl symbol
+global_var_initializer ::= 'nevermind'
 
-return_type ::= return_old | return_new
-return_new ::= type_expr new_dims?        // Note, dims not yet supported.
-return_old ::= old_dims? label?
+global_var_storage_class ::= STATIC_KEYWORD
 
-argdecl ::= arg_old | arg_new
-arg_new ::= "const"? type_expr '&'? symbol old_dims? ('=' arg_init)?
-arg_old ::= "const"? tags? '&'? symbol old_dims? ('=' arg_init)?
-arg_init ::= literal | symbol
+type_decl ::= (builtin_type | symbol) (LBRACKET RBRACKET)*
 
-vardecl ::= var_old | var_new
-var_new ::= var_new_prefix type_expr symbol old_dims?
-var_new_prefix ::= "static" | "const"
-var_old ::= var_old_prefix tag? symbol old_dims?
-var_old_prefix ::= "new" | "decl" | "static" | "const"
+private builtin_type ::= VOID_TYPE
+                       | INT_TYPE
+                       | FLOAT_TYPE
+                       | CHAR_TYPE
+                       | BOOL_TYPE
 
-global ::= global_old | global_new
-global_new ::= storage_class* type_expr symbol old_dims?
-global_old ::= storage_class* tag? symbol old_dims?
+func ::= func_storage_class? type_decl symbol param_list stmt
+private func_storage_class ::= PUBLIC_KEYWORD
+                             | STOCK_KEYWORD STATIC_KEYWORD?
+                             | STATIC_KEYWORD STOCK_KEYWORD?
 
-storage_class ::= "public" | "static" | "const" | "stock"
+param_list ::= LPAREN <<list param_decl>>? RPAREN
+param_decl ::= CONST_KEYWORD? type_decl AND? symbol  // TODO: dims
 
-type_expr ::= (builtin_type | symbol) new_dims?
-builtin_type ::= "void"
-               | "int"
-               | "float"
-               | "char"
-               | "bool"
+private meta stmt_of ::= <<param>> | <<compound_stmt_of <<param>> >>
+private meta compound_stmt_of ::= LBRACE <<param>>* RBRACE { pin = 1 }
 
-tags ::= tag_vector | tag
-tag_vector ::= '{' symbol (',' symbol)* '}' ':'
-tag ::= label
+private stmt ::= compound_stmt
+               | single_stmt
 
-new_dims ::= ('[' ']')*
-old_dims ::= ('[' expr? ']')+
+private single_stmt ::= simple_stmt
+                      | if_stmt
+                      | switch_stmt
+                      | for_loop
+                      | while_loop
+                      | do_while_loop
+                      | return_stmt
+private compound_stmt ::= <<compound_stmt_of stmt>>
 
-label ::= symbol ':'
+private loop_stmt ::= <<stmt_of (single_stmt | continue_stmt | break_stmt)>>
 
-literal ::= number | string_literal | character_literal
-number ::= integer_literal | hex_literal | float_literal
+private simple_stmt ::= simple_expression SEMICOLON { pin = 2 }
+private simple_expression ::= expr
+                            | local_decl
+
+if_stmt ::= IF_KEYWORD LPAREN expr RPAREN stmt (ELSE_KEYWORD stmt)?
+
+switch_stmt ::= SWITCH_KEYWORD LPAREN expr RPAREN LBRACE (switch_case | switch_default)* RBRACE
+switch_case ::= CASE_KEYWORD <<list expr>> COLON stmt
+switch_default ::= DEFAULT_KEYWORD COLON stmt
+
+for_loop ::= FOR_KEYWORD LPAREN for_init? SEMICOLON for_condition? SEMICOLON for_iteration? RPAREN loop_stmt
+private for_init ::= <<list simple_expression>>
+private for_condition ::= expr
+private for_iteration ::= expr
+
+while_loop ::= WHILE_KEYWORD LPAREN while_condition RPAREN stmt
+private while_condition ::= expr
+do_while_loop ::= DO_KEYWORD stmt WHILE_KEYWORD LPAREN while_condition RPAREN SEMICOLON
+
+continue_stmt ::= CONTINUE_KEYWORD SEMICOLON
+break_stmt ::= BREAK_KEYWORD SEMICOLON
+
+return_stmt ::= RETURN_KEYWORD expr? SEMICOLON
+
+// TODO: dims
+local_decl ::= (STATIC_KEYWORD | CONST_KEYWORD)? type_decl symbol (EQ expr)?
+
+expr ::= assignment_expr
+       | ternary_expr
+       | logical_or_expr
+       | logical_and_expr
+       | inclusive_or_expr
+       | exclusive_or_expr
+       | and_expr
+       | equality_expr
+       | relational_expr
+       | shift_expr
+       | additive_expr
+       | multiplicative_expr
+       | unary_group
+       | postfix_group
+       | primary_expr
+       | literal
+       { extraRoot = true }
+
+ternary_expr ::= expr QUEST expr COLON expr { pin = 2 }
+
+assignment_expr ::= symbol assignment_op expr {
+  pin = 2
+  rightAssociative = true
+}
+
+private assignment_op ::= EQ
+                        | PLUSEQ
+                        | MINUSEQ
+                        | ASTERISKEQ
+                        | DIVEQ
+                        | ANDEQ
+                        | OREQ
+                        | XOREQ
+                        | PERCEQ
+                        | LTLTEQ
+                        | GTGTEQ
+
+private postfix_group ::= subscript_expr
+                        | post_increment_expr
+                        | post_decrement_expr
+
+private unary_group ::= pre_increment_expr
+                      | pre_decrement_expr
+                      | ref_expr
+                      | deref_expr
+                      | positive_expr
+                      | negative_expr
+                      | not_expr
+                      | logical_not_expr
+
+logical_or_expr ::= expr OROR expr { pin = 2 }
+logical_and_expr ::= expr ANDAND expr { pin = 2 }
+inclusive_or_expr ::= expr XOR expr { pin = 2 }
+exclusive_or_expr ::= expr OR expr { pin = 2 }
+and_expr ::= expr AND expr { pin = 2 }
+equality_expr ::= expr (EQEQ | NE) expr { pin = 2 }
+relational_expr ::= expr (LT | GT | LTLTEQ | GTGTEQ) expr { pin = 2 }
+shift_expr ::= expr (LTLT | GTGT) expr { pin = 2 }
+additive_expr ::= expr (PLUS | MINUS) expr { pin = 2 }
+multiplicative_expr ::= expr (ASTERISK | DIV | PERC) expr { pin = 2 }
+
+pre_increment_expr ::= PLUSPLUS expr
+pre_decrement_expr ::= MINUSMINUS expr
+ref_expr ::= AND expr
+deref_expr ::= ASTERISK expr
+positive_expr ::= PLUS expr
+negative_expr ::= MINUS expr
+not_expr ::= TILDE expr
+logical_not_expr ::= EXCL expr
+
+post_increment_expr ::= expr PLUSPLUS { pin = 2 }
+post_decrement_expr ::= expr MINUSMINUS { pin = 2 }
+subscript_expr ::= expr LBRACKET expr RBRACKET { pin=2 }
+
+primary_expr ::= symbol
+               | literal
+               | paren_expr
+
+paren_expr ::= LPAREN expr RPAREN { pin = 1 }
+
+literal ::= integer_literal
+          | float_literal
+          | hex_literal
+          | binary_literal
+          | string_literal
+          | character_literal
+          { extends = expr }
