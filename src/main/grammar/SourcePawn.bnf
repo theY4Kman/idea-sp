@@ -77,6 +77,7 @@
     STATE_KEYWORD="state"
     SWITCH_KEYWORD="switch"
     WHILE_KEYWORD="while"
+    USING_KEYWORD="using"
 
     DEFINED_KEYWORD="defined"
     SIZEOF_KEYWORD="sizeof"
@@ -99,6 +100,8 @@
     // SourcePawn-specific keywords
     ENUM_KEYWORD="enum"
     STRUCT_KEYWORD="struct"
+    METHODMAP_KEYWORD="methodmap"
+    PROPERTY_KEYWORD="property"
 
     VIEW_AS_KEYWORD="view_as"
 
@@ -135,17 +138,22 @@ private root ::= global*
 private meta list ::= <<param>> ( COMMA <<param>> )*
 
 private global ::= global_var_decl_statement
+                 | enum_decl SEMICOLON? // XXX: pull out to rule?
+                 | func_decl
+                 | using_stmt
+                 | methodmap
                  | func
 
 global_var_decl_statement ::= global_var_decl SEMICOLON
                             | global_var_decl EQ global_var_initializer SEMICOLON
 
-global_var_decl ::= global_var_storage_class? type_decl symbol
-global_var_initializer ::= 'nevermind'
+global_var_decl ::= global_var_storage_class? CONST_KEYWORD? type_expression symbol
+global_var_storage_class ::= STATIC_KEYWORD | PUBLIC_KEYWORD
+global_var_initializer ::= expr | struct
 
-global_var_storage_class ::= STATIC_KEYWORD
-
-type_decl ::= (builtin_type | symbol) (LBRACKET RBRACKET)*
+type_expression ::= (builtin_type | symbol) type_dims
+private type_dims ::= (LBRACKET RBRACKET)*
+private old_dims ::= (LBRACKET expr? RBRACKET)+
 
 private builtin_type ::= VOID_TYPE
                        | INT_TYPE
@@ -153,13 +161,40 @@ private builtin_type ::= VOID_TYPE
                        | CHAR_TYPE
                        | BOOL_TYPE
 
-func ::= func_storage_class? type_decl symbol param_list stmt
+tags ::= tag-vector | tag
+private tag-vector ::= LBRACE <<list symbol>> RBRACE
+private tag ::= symbol COLON { pin = 2 }
+
+struct ::= LBRACE <<list struct_item>> RBRACE
+struct_item ::= symbol EQ expr { pin = 2 }  // XXX: be more restrictive?
+
+func_decl ::= (NATIVE_KEYWORD | FORWARD_KEYWORD) type_expression symbol param_list SEMICOLON { pin = 1 }
+
+// Statement is only used in handles.inc, and the parser only allows this incantation
+using_stmt ::= USING_KEYWORD '__intrinsics__' DOT 'Handle' SEMICOLON
+
+methodmap ::= METHODMAP_KEYWORD symbol LBRACE methodmap_entry* RBRACE { pin = 1 }
+private methodmap_entry ::= methodmap_method | methodmap_prop
+
+methodmap_method ::= methodmap_method_decl | methodmap_method_impl
+private methodmap_method_decl ::= PUBLIC_KEYWORD NATIVE_KEYWORD? type_expression symbol param_list SEMICOLON
+private methodmap_method_impl ::= PUBLIC_KEYWORD type_expression symbol param_list stmt
+
+methodmap_prop ::= PROPERTY_KEYWORD type_expression symbol LBRACE prop_decl* RBRACE { pin = 1 }
+prop_decl ::= prop_method_decl | prop_method_impl
+accessor_name ::= 'get' | 'set'
+private prop_method_decl ::= PUBLIC_KEYWORD NATIVE_KEYWORD? accessor_name param_list SEMICOLON
+private prop_method_impl ::= PUBLIC_KEYWORD accessor_name param_list stmt
+
+func ::= func_storage_class? type_expression symbol param_list stmt
 private func_storage_class ::= PUBLIC_KEYWORD
                              | STOCK_KEYWORD STATIC_KEYWORD?
                              | STATIC_KEYWORD STOCK_KEYWORD?
 
-param_list ::= LPAREN <<list param_decl>>? RPAREN
-param_decl ::= CONST_KEYWORD? type_decl AND? symbol  // TODO: dims
+param_list ::= LPAREN <<list param_decl>>? RPAREN { pin = 1 }
+param_decl ::= param_decl_old | param_decl_new
+private param_decl_old ::= CONST_KEYWORD? tags AND? symbol old_dims? (EQ expr)?
+private param_decl_new ::= CONST_KEYWORD? type_expression AND? symbol old_dims? (EQ expr)?
 
 private meta stmt_of ::= <<param>> | <<compound_stmt_of <<param>> >>
 private meta compound_stmt_of ::= LBRACE <<param>>* RBRACE { pin = 1 }
@@ -174,13 +209,13 @@ private single_stmt ::= simple_stmt
                       | while_loop
                       | do_while_loop
                       | return_stmt
+                      | enum_decl
 private compound_stmt ::= <<compound_stmt_of stmt>>
 
 private loop_stmt ::= <<stmt_of (single_stmt | continue_stmt | break_stmt)>>
 
 private simple_stmt ::= simple_expression SEMICOLON { pin = 2 }
-private simple_expression ::= expr
-                            | local_decl
+private simple_expression ::= local_decl | expr
 
 if_stmt ::= IF_KEYWORD LPAREN expr RPAREN stmt (ELSE_KEYWORD stmt)?
 
@@ -202,8 +237,11 @@ break_stmt ::= BREAK_KEYWORD SEMICOLON
 
 return_stmt ::= RETURN_KEYWORD expr? SEMICOLON
 
-// TODO: dims
-local_decl ::= (STATIC_KEYWORD | CONST_KEYWORD)? type_decl symbol (EQ expr)?
+enum_decl ::= ENUM_KEYWORD symbol LBRACE <<list enum_item>> COMMA? RBRACE { pin = 1 }
+enum_item ::= symbol (EQ integer)?
+
+local_decl ::= (STATIC_KEYWORD | CONST_KEYWORD)? type_expression symbol old_dims? local_initializer?
+private local_initializer ::= EQ expr { pin = 1 }
 
 expr ::= assignment_expr
        | ternary_expr
@@ -254,6 +292,7 @@ private unary_group ::= pre_increment_expr
                       | negative_expr
                       | not_expr
                       | logical_not_expr
+                      | view_as_expr
 
 logical_or_expr ::= expr OROR expr { pin = 2 }
 logical_and_expr ::= expr ANDAND expr { pin = 2 }
@@ -274,6 +313,7 @@ positive_expr ::= PLUS expr
 negative_expr ::= MINUS expr
 not_expr ::= TILDE expr
 logical_not_expr ::= EXCL expr
+view_as_expr ::= VIEW_AS_KEYWORD LT type_expression GT paren_expr
 
 post_increment_expr ::= expr PLUSPLUS { pin = 2 }
 post_decrement_expr ::= expr MINUSMINUS { pin = 2 }
@@ -285,10 +325,18 @@ primary_expr ::= symbol
 
 paren_expr ::= LPAREN expr RPAREN { pin = 1 }
 
-literal ::= integer_literal
-          | float_literal
-          | hex_literal
-          | binary_literal
+literal ::= number
           | string_literal
           | character_literal
+          { extends = expr }
+
+number ::= integer
+         | rational
+         { extends = expr }
+
+rational ::= float_literal { extends = expr }
+
+integer ::= integer_literal
+          | binary_literal
+          | hex_literal
           { extends = expr }

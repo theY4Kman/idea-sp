@@ -56,6 +56,7 @@ SYMBOL=([@_a-zA-Z][@_a-zA-Z0-9]+|[a-zA-Z][@_a-zA-Z0-9]*)
   {BLOCK_COMMENT_START}       { commentStart = zzStartRead;
                                 yybegin(COMMENT); }
 
+  // TODO: separate newlines into separate token. some parsing requires knowledge of newlines (e.g. struct decls).
   {WHITE_SPACE}               { return com.intellij.psi.TokenType.WHITE_SPACE; }
 
   "="                         { return EQ; }
@@ -117,6 +118,7 @@ SYMBOL=([@_a-zA-Z][@_a-zA-Z0-9]+|[a-zA-Z][@_a-zA-Z0-9]*)
   "state"                     { return STATE_KEYWORD; }
   "switch"                    { return SWITCH_KEYWORD; }
   "while"                     { return WHILE_KEYWORD; }
+  "using"                     { return USING_KEYWORD; }
   "defined"                   { return DEFINED_KEYWORD; }
   "sizeof"                    { return SIZEOF_KEYWORD; }
   "tagof"                     { return TAGOF_KEYWORD; }
@@ -131,13 +133,15 @@ SYMBOL=([@_a-zA-Z][@_a-zA-Z0-9]+|[a-zA-Z][@_a-zA-Z0-9]*)
   "decl"                      { return DECL_KEYWORD; }
   "enum"                      { return ENUM_KEYWORD; }
   "struct"                    { return STRUCT_KEYWORD; }
+  "methodmap"                 { return METHODMAP_KEYWORD; }
+  "property"                  { return PROPERTY_KEYWORD; }
+  "view_as"                   { return VIEW_AS_KEYWORD; }
   "void"                      { return VOID_TYPE; }
   "int"                       { return INT_TYPE; }
   "float"                     { return FLOAT_TYPE; }
   "char"                      { return CHAR_TYPE; }
   "bool"                      { return BOOL_TYPE; }
   "expr"                      { return EXPR; }
-  "view_as"                   { return VIEW_AS_KEYWORD; }
 
   {SPACE}                     { return SPACE; }
   {LINE_COMMENT}              { return LINE_COMMENT; }
