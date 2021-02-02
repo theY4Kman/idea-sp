@@ -31,3 +31,6 @@ build
 
 # Swap files
 *~
+
+# Generated artifacts
+src/main/gen
