@@ -49,7 +49,7 @@ SYMBOL=([@_a-zA-Z][@_a-zA-Z0-9]+|[a-zA-Z][@_a-zA-Z0-9]*)
   {BLOCK_COMMENT_END}         { yybegin(YYINITIAL);
                                 zzStartRead = commentStart;
                                 return BLOCK_COMMENT; }
-  [\s\S]                      { }
+  [\s\S\n]                    { }
 }
 
 <YYINITIAL> {
