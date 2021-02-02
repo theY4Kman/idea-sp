@@ -155,9 +155,11 @@ global_var_decl ::= global_var_storage_class? CONST_KEYWORD? type_expression sym
 global_var_storage_class ::= STATIC_KEYWORD | PUBLIC_KEYWORD
 global_var_initializer ::= expr | struct
 
-type_expression ::= (builtin_type | symbol) type_dims
+type_expression ::= type type_dims
+private type ::= (builtin_type | symbol)
 private type_dims ::= (LBRACKET RBRACKET)*
 private old_dims ::= (LBRACKET expr? RBRACKET)+
+private def_dims ::= (LBRACKET expr RBRACKET)+
 
 private builtin_type ::= ANY_TYPE
                        | VOID_TYPE
@@ -298,6 +300,8 @@ private unary_group ::= pre_increment_expr
                       | not_expr
                       | logical_not_expr
                       | view_as_expr
+                      | new_expr
+                      | call_expr
 
 logical_or_expr ::= expr OROR expr { pin = 2 }
 logical_and_expr ::= expr ANDAND expr { pin = 2 }
@@ -319,6 +323,9 @@ negative_expr ::= MINUS expr
 not_expr ::= TILDE expr
 logical_not_expr ::= EXCL expr
 view_as_expr ::= VIEW_AS_KEYWORD LT type_expression GT paren_expr
+new_expr ::= NEW_KEYWORD (type def_dims | call_expr) { pin = 1 }
+call_expr ::= symbol LPAREN <<list call_arg>>? RPAREN { pin = 2 }
+call_arg ::= expr | DOT symbol EQ expr
 
 post_increment_expr ::= expr PLUSPLUS { pin = 2 }
 post_decrement_expr ::= expr MINUSMINUS { pin = 2 }
