@@ -180,7 +180,7 @@ func_decl ::= (NATIVE_KEYWORD | FORWARD_KEYWORD) type_expression symbol param_li
 // Statement is only used in handles.inc, and the parser only allows this incantation
 using_stmt ::= USING_KEYWORD '__intrinsics__' DOT 'Handle' SEMICOLON
 
-methodmap ::= METHODMAP_KEYWORD symbol (LT symbol)? LBRACE methodmap_entry* RBRACE { pin = 1 }
+methodmap ::= METHODMAP_KEYWORD symbol (LT symbol)? LBRACE methodmap_entry* RBRACE SEMICOLON? { pin = 1 }
 private methodmap_entry ::= methodmap_method | methodmap_prop
 
 methodmap_method ::= methodmap_method_decl | methodmap_method_impl
