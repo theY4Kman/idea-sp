@@ -149,7 +149,7 @@ private global ::= global_var_decl_statement
 global_var_decl_statement ::= global_var_decl SEMICOLON
                             | global_var_decl EQ global_var_initializer SEMICOLON
 
-global_var_decl ::= global_var_storage_class? CONST_KEYWORD? type_expression symbol
+global_var_decl ::= global_var_storage_class? CONST_KEYWORD? type_expression symbol old_dims?
 global_var_storage_class ::= STATIC_KEYWORD | PUBLIC_KEYWORD
 global_var_initializer ::= expr | struct
 
