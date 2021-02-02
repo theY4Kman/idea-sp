@@ -243,7 +243,7 @@ return_stmt ::= RETURN_KEYWORD expr? SEMICOLON
 enum_decl ::= ENUM_KEYWORD symbol LBRACE <<list enum_item>> COMMA? RBRACE { pin = 1 }
 enum_item ::= symbol (EQ integer)?
 
-local_decl ::= (STATIC_KEYWORD | CONST_KEYWORD)? type_expression symbol old_dims? local_initializer?
+local_decl ::= (STATIC_KEYWORD | CONST_KEYWORD)? type_expression symbol old_dims? local_initializer? { pin = 2 }
 private local_initializer ::= EQ expr { pin = 1 }
 
 expr ::= assignment_expr
@@ -331,7 +331,10 @@ paren_expr ::= LPAREN expr RPAREN { pin = 1 }
 literal ::= number
           | string_literal
           | character_literal
+          | array_literal
           { extends = expr }
+
+array_literal ::= LBRACE <<list expr>> (COMMA ELLIPSIS)? RBRACE
 
 number ::= integer
          | rational
