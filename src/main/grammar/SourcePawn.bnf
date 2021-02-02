@@ -112,6 +112,7 @@
     BOOL_TYPE="bool"
 
     line_comment="regexp://[^\r\n]*"
+    doc_comment="regexp:/\*\*(.|\n)*?\*/"
     block_comment="regexp:/\*(.|\n)*?\*/"
     preprocessor_comment="regexp:#(assert|define|else|elseif|endif|endinput|error|file|if|include|line|pragma|section|tryinclude|undef)[^\r\n]*"
 

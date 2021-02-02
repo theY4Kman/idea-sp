@@ -22,6 +22,7 @@ import static org.idea_sp.psi.SourcePawnTypes.*;
   int yyline;
   int yycolumn;
   int commentStart;
+  IElementType commentType;
 %}
 
 EOL="\r"|"\n"|"\r\n"
@@ -31,6 +32,8 @@ WHITE_SPACE=({LINE_WS}|{EOL})+
 SPACE=[\ \n\r\t\f]
 LINE_COMMENT="//"[^\r\n]*
 BLOCK_COMMENT=[\s\S]
+DOC_COMMENT=[\s\S\n]
+BLOCK_COMMENT_DOC_START="/*"
 BLOCK_COMMENT_START="/*"
 BLOCK_COMMENT_END="*/"
 PREPROCESSOR_COMMENT=#(assert|define|else|elseif|endif|endinput|error|file|if|include|line|pragma|section|tryinclude|undef)[^\r\n]*
@@ -48,12 +51,16 @@ SYMBOL=([@_a-zA-Z][@_a-zA-Z0-9]+|[a-zA-Z][@_a-zA-Z0-9]*)
 <COMMENT> {
   {BLOCK_COMMENT_END}         { yybegin(YYINITIAL);
                                 zzStartRead = commentStart;
-                                return BLOCK_COMMENT; }
+                                return commentType; }
   [\s\S\n]                    { }
 }
 
 <YYINITIAL> {
+  {BLOCK_COMMENT_DOC_START}   { commentStart = zzStartRead;
+                                commentType = DOC_COMMENT;
+                                yybegin(COMMENT); }
   {BLOCK_COMMENT_START}       { commentStart = zzStartRead;
+                                commentType = BLOCK_COMMENT;
                                 yybegin(COMMENT); }
 
   // TODO: separate newlines into separate token. some parsing requires knowledge of newlines (e.g. struct decls).
