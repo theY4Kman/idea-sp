@@ -43,6 +43,7 @@ tasks.register<GenerateLexer>("generateSourcePawnLexer") {
     source = "src/main/grammar/SourcePawn.flex"
     targetDir = "src/main/gen/org/idea_sp/"
     targetClass = "_SourcePawnLexer"
+    purgeOldFiles = true
 }
 
 tasks.register<GenerateParser>("generateSourcePawnParser") {
@@ -50,4 +51,5 @@ tasks.register<GenerateParser>("generateSourcePawnParser") {
     pathToParser = "/org/idea_sp/parser/SourcePawnParser.java"
     pathToPsiRoot = "/org/idea_sp/parser/psi"
     targetRoot = "src/main/gen"
+    purgeOldFiles = true
 }
