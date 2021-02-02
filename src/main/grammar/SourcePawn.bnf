@@ -130,7 +130,7 @@
   ]
 }
 
-private root ::= global
+private root ::= global*
 
 private meta list ::= <<param>> ( COMMA <<param>> )*
 
