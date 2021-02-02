@@ -97,6 +97,8 @@
     NEW_KEYWORD="new"
     PUBLIC_KEYWORD="public"
 
+    NULL_KEYWORD="null"
+
     // SourcePawn-specific keywords
     ENUM_KEYWORD="enum"
     STRUCT_KEYWORD="struct"
@@ -328,7 +330,8 @@ primary_expr ::= symbol
 
 paren_expr ::= LPAREN expr RPAREN { pin = 1 }
 
-literal ::= number
+literal ::= NULL_KEYWORD
+          | number
           | string_literal
           | character_literal
           | array_literal

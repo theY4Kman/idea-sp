@@ -137,6 +137,7 @@ SYMBOL=([@_a-zA-Z][@_a-zA-Z0-9]+|[a-zA-Z][@_a-zA-Z0-9]*)
   "public"                    { return PUBLIC_KEYWORD; }
   "static"                    { return STATIC_KEYWORD; }
   "stock"                     { return STOCK_KEYWORD; }
+  "null"                      { return NULL_KEYWORD; }
   "decl"                      { return DECL_KEYWORD; }
   "enum"                      { return ENUM_KEYWORD; }
   "struct"                    { return STRUCT_KEYWORD; }
