@@ -143,6 +143,7 @@ SYMBOL=([@_a-zA-Z][@_a-zA-Z0-9]+|[a-zA-Z][@_a-zA-Z0-9]*)
   "methodmap"                 { return METHODMAP_KEYWORD; }
   "property"                  { return PROPERTY_KEYWORD; }
   "view_as"                   { return VIEW_AS_KEYWORD; }
+  "any"                       { return ANY_TYPE; }
   "void"                      { return VOID_TYPE; }
   "int"                       { return INT_TYPE; }
   "float"                     { return FLOAT_TYPE; }
