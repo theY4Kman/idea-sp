@@ -24,15 +24,15 @@ class SourcePawnParserDefinition : ParserDefinition {
     }
 
     override fun getWhitespaceTokens(): TokenSet {
-        return WHITE_SPACES
+        return SourcePawnTokenTypeSets.WHITE_SPACES
     }
 
     override fun getCommentTokens(): TokenSet {
-        return COMMENTS
+        return SourcePawnTokenTypeSets.COMMENTS
     }
 
     override fun getStringLiteralElements(): TokenSet {
-        return STRING_LITERALS
+        return SourcePawnTokenTypeSets.STRINGS
     }
 
     override fun createParser(project: Project): PsiParser {
@@ -47,7 +47,7 @@ class SourcePawnParserDefinition : ParserDefinition {
         return SourcePawnFile(viewProvider)
     }
 
-    override fun spaceExistanceTypeBetweenTokens(left: ASTNode, right: ASTNode): SpaceRequirements {
+    override fun spaceExistenceTypeBetweenTokens(left: ASTNode, right: ASTNode): SpaceRequirements {
         return SpaceRequirements.MAY
     }
 
@@ -56,13 +56,6 @@ class SourcePawnParserDefinition : ParserDefinition {
     }
 
     companion object {
-        val WHITE_SPACES = TokenSet.create(TokenType.WHITE_SPACE)
-        val COMMENTS = TokenSet.create(
-            SourcePawnTypes.LINE_COMMENT,
-            SourcePawnTypes.BLOCK_COMMENT,
-            SourcePawnTypes.PREPROCESSOR_COMMENT
-        )
-        val STRING_LITERALS = TokenSet.create(SourcePawnTypes.STRING_LITERAL, SourcePawnTypes.CHARACTER_LITERAL)
         val FILE = IFileElementType(SourcePawnLanguage)
     }
 }

@@ -1,5 +1,6 @@
 package org.idea_sp
 
+import com.intellij.openapi.editor.DefaultLanguageHighlighterColors
 import com.intellij.openapi.editor.colors.TextAttributesKey
 import com.intellij.openapi.fileTypes.SyntaxHighlighter
 import com.intellij.openapi.options.colors.AttributesDescriptor
@@ -10,10 +11,30 @@ import javax.swing.Icon
 class SourcePawnColorSettingsPage : ColorSettingsPage {
     companion object {
         private val DESCRIPTORS = arrayOf(
-            AttributesDescriptor("Operator", SourcePawnSyntaxHighlighter.OPERATOR),
-            AttributesDescriptor("Literal", SourcePawnSyntaxHighlighter.LITERAL),
-            AttributesDescriptor("Reserved", SourcePawnSyntaxHighlighter.RESERVED),
-            AttributesDescriptor("Comment", SourcePawnSyntaxHighlighter.COMMENT),
+            AttributesDescriptor(
+                "Operator", TextAttributesKey.createTextAttributesKey(
+                    "SOURCE_PAWN_OPERATOR",
+                    DefaultLanguageHighlighterColors.OPERATION_SIGN
+                )
+            ),
+            AttributesDescriptor(
+                "Literal", TextAttributesKey.createTextAttributesKey(
+                    "SOURCE_PAWN_CONSTANT",
+                    DefaultLanguageHighlighterColors.CONSTANT
+                )
+            ),
+            AttributesDescriptor(
+                "Reserved", TextAttributesKey.createTextAttributesKey(
+                    "SOURCE_PAWN_RESERVED",
+                    DefaultLanguageHighlighterColors.KEYWORD
+                )
+            ),
+            AttributesDescriptor(
+                "Comment", TextAttributesKey.createTextAttributesKey(
+                    "SOURCE_PAWN_COMMENT",
+                    DefaultLanguageHighlighterColors.LINE_COMMENT
+                )
+            ),
         );
     }
 
