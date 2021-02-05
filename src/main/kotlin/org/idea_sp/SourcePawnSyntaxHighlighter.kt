@@ -17,6 +17,7 @@ class SourcePawnSyntaxHighlighter : SyntaxHighlighterBase() {
         val IDENTIFIER = TextAttributesKey.createTextAttributesKey("SOURCE_PAWN_IDENTIFIER", DefaultLanguageHighlighterColors.IDENTIFIER)
         val NUMBER = TextAttributesKey.createTextAttributesKey("SOURCE_PAWN_NUMBER", DefaultLanguageHighlighterColors.NUMBER)
         val KEYWORD = TextAttributesKey.createTextAttributesKey("SOURCE_PAWN_KEYWORD", DefaultLanguageHighlighterColors.KEYWORD)
+        val LANG_CONST = TextAttributesKey.createTextAttributesKey("SOURCE_PAWN_LANG_CONST", DefaultLanguageHighlighterColors.PREDEFINED_SYMBOL)
         val STRING = TextAttributesKey.createTextAttributesKey("SOURCE_PAWN_STRING", DefaultLanguageHighlighterColors.STRING)
         val OPERATOR = TextAttributesKey.createTextAttributesKey("SOURCE_PAWN_OPERATOR", DefaultLanguageHighlighterColors.OPERATION_SIGN)
         val BRACES = TextAttributesKey.createTextAttributesKey("SOURCE_PAWN_BRACES", DefaultLanguageHighlighterColors.BRACES)
@@ -45,10 +46,21 @@ class SourcePawnSyntaxHighlighter : SyntaxHighlighterBase() {
             SourcePawnTypes.SYMBOL to IDENTIFIER,
 
             SourcePawnTypes.TYPE_EXPRESSION to TYPE,
+            SourcePawnTypes.VOID_TYPE to TYPE,
+            SourcePawnTypes.INT_TYPE to TYPE,
+            SourcePawnTypes.FLOAT_TYPE to TYPE,
+            SourcePawnTypes.CHAR_TYPE to TYPE,
+            SourcePawnTypes.BOOL_TYPE to TYPE,
+            SourcePawnTypes.FUNCTION_TYPE to TYPE,
 
             SourcePawnTypes.NUMBER to NUMBER,
             SourcePawnTypes.RATIONAL to NUMBER,
             SourcePawnTypes.INTEGER to NUMBER,
+
+            SourcePawnTypes.TRUE_KEYWORD to LANG_CONST,
+            SourcePawnTypes.FALSE_KEYWORD to LANG_CONST,
+            SourcePawnTypes.NULL_KEYWORD to LANG_CONST,
+            SourcePawnTypes.UNDERSCORE to LANG_CONST,
         )
 
         init {

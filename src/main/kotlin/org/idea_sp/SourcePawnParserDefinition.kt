@@ -24,7 +24,7 @@ class SourcePawnParserDefinition : ParserDefinition {
     }
 
     override fun getWhitespaceTokens(): TokenSet {
-        return WHITE_SPACES
+        return SourcePawnTokenTypeSets.WHITE_SPACES
     }
 
     override fun getCommentTokens(): TokenSet {
@@ -56,7 +56,6 @@ class SourcePawnParserDefinition : ParserDefinition {
     }
 
     companion object {
-        val WHITE_SPACES = TokenSet.create(TokenType.WHITE_SPACE)
         val FILE = IFileElementType(SourcePawnLanguage)
     }
 }

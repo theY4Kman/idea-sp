@@ -1,5 +1,6 @@
 package org.idea_sp
 
+import com.intellij.psi.TokenType
 import com.intellij.psi.tree.TokenSet
 import org.idea_sp.psi.SourcePawnTypes
 
@@ -44,6 +45,8 @@ interface SourcePawnTokenTypeSets {
             SourcePawnTypes.ENUM_KEYWORD,
             SourcePawnTypes.STRUCT_KEYWORD,
             SourcePawnTypes.METHODMAP_KEYWORD,
+            SourcePawnTypes.TYPEDEF_KEYWORD,
+            SourcePawnTypes.TYPESET_KEYWORD,
             SourcePawnTypes.PROPERTY_KEYWORD,
             SourcePawnTypes.VIEW_AS_KEYWORD
         )
@@ -91,6 +94,9 @@ interface SourcePawnTokenTypeSets {
         val STRINGS = TokenSet.create(
             SourcePawnTypes.STRING_LITERAL,
             SourcePawnTypes.CHARACTER_LITERAL,
+        )
+        val WHITE_SPACES = TokenSet.create(
+            TokenType.WHITE_SPACE,
         )
     }
 }

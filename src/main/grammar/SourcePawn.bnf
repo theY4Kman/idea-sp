@@ -22,6 +22,7 @@
     TILDE="~"
     QUEST="?"
     COLON=":"
+    COLONCOLON="::"
     PLUS="+"
     MINUS="-"
     ASTERISK="*"
@@ -60,6 +61,7 @@
     PERCEQ="%="
     LTLTEQ="<<="
     GTGTEQ=">>="
+    UNDERSCORE="_"
 
     ASSERT_KEYWORD="assert"
     BREAK_KEYWORD="break"
@@ -97,6 +99,8 @@
     NEW_KEYWORD="new"
     PUBLIC_KEYWORD="public"
 
+    TRUE_KEYWORD="true"
+    FALSE_KEYWORD="false"
     NULL_KEYWORD="null"
 
     // SourcePawn-specific keywords
@@ -104,6 +108,8 @@
     STRUCT_KEYWORD="struct"
     METHODMAP_KEYWORD="methodmap"
     PROPERTY_KEYWORD="property"
+    TYPEDEF_KEYWORD="typedef"
+    TYPESET_KEYWORD="typeset"
 
     VIEW_AS_KEYWORD="view_as"
 
@@ -113,25 +119,27 @@
     FLOAT_TYPE="float"
     CHAR_TYPE="char"
     BOOL_TYPE="bool"
+    FUNCTION_TYPE="function"
 
     line_comment="regexp://[^\r\n]*"
     doc_comment="regexp:/\*\*(.|\n)*?\*/"
     block_comment="regexp:/\*(.|\n)*?\*/"
     preprocessor_comment="regexp:#(assert|define|else|elseif|endif|endinput|error|file|if|include|line|pragma|section|tryinclude|undef)[^\r\n]*"
 
-    integer_literal="regexp:[-+]?\d[_\d]*"
-    float_literal="regexp:[-+]?\d[_\d]*\.\d[_\d]*(e[-+]?\d+)?"
-    hex_literal="regexp:[-+]?0x[a-fA-F0-9_]+"
-    binary_literal="regexp:[-+]?0b[01_]+"
+    integer_literal="regexp:(\b[-+])?\d[_\d]*"
+    float_literal="regexp:(\b[-+])?\d[_\d]*\.\d[_\d]*(e[-+]?\d+)?"
+    hex_literal="regexp:(\b[-+])?0x[a-fA-F0-9_]+"
+    binary_literal="regexp:(\b[-+])?0b[01_]+"
 
     string_literal="regexp:\"(\\.|[^\"])*\""
-    character_literal="regexp:'(\\.|[^\"])'"
+    character_literal="regexp:'(\\.|[^'])'"
 
     // @ and _ are not themselves valid identifiers.
     identifier="regexp:([@_a-zA-Z][@_a-zA-Z0-9]+|[a-zA-Z][@_a-zA-Z0-9]*)"
 
     symbol="regexp:([@_a-zA-Z][@_a-zA-Z0-9]+|[a-zA-Z][@_a-zA-Z0-9]*)"
 
+    EOL="regexp:\r|\n|\r\n"
     // TODO: remove me (for live preview purposes only)
     SPACE="regexp:[ \n\r\t\f]"
   ]
@@ -140,12 +148,16 @@
 private root ::= global*
 
 private meta list ::= <<param>> ( COMMA <<param>> )*
+private meta list_maybe_trailing_comma ::= <<list <<param>>>> COMMA?
 
 private global ::= global_var_decl_statement
                  | enum_decl SEMICOLON? // XXX: pull out to rule?
                  | func_decl
                  | using_stmt
                  | methodmap
+                 | typedef
+                 | typeset SEMICOLON?
+                 | struct_decl SEMICOLON?
                  | func
 
 global_var_decl_statement ::= global_var_decl SEMICOLON
@@ -153,7 +165,7 @@ global_var_decl_statement ::= global_var_decl SEMICOLON
 
 global_var_decl ::= global_var_storage_class? CONST_KEYWORD? type_expression symbol old_dims?
 global_var_storage_class ::= STATIC_KEYWORD | PUBLIC_KEYWORD
-global_var_initializer ::= expr | struct
+global_var_initializer ::= struct_literal | expr
 
 type_expression ::= type type_dims
 private type ::= (builtin_type | symbol)
@@ -167,15 +179,17 @@ private builtin_type ::= ANY_TYPE
                        | FLOAT_TYPE
                        | CHAR_TYPE
                        | BOOL_TYPE
+                       | FUNCTION_TYPE
 
 tags ::= tag-vector | tag
-private tag-vector ::= LBRACE <<list symbol>> RBRACE
+private tag-vector ::= LBRACE <<list symbol>> RBRACE { pin = 1 }
 private tag ::= symbol COLON { pin = 2 }
 
-struct ::= LBRACE <<list struct_item>> RBRACE
-struct_item ::= symbol EQ expr { pin = 2 }  // XXX: be more restrictive?
+struct_literal ::= LBRACE <<list_maybe_trailing_comma struct_literal_item>> RBRACE
+struct_literal_item ::= symbol EQ expr { pin = 2 }  // XXX: be more restrictive?
 
-func_decl ::= (NATIVE_KEYWORD | FORWARD_KEYWORD) type_expression symbol param_list SEMICOLON { pin = 1 }
+// NOTE: "float" is only allowed in older versions of the compiler, where it is a native.
+func_decl ::= (NATIVE_KEYWORD | FORWARD_KEYWORD) type_expression (symbol | FLOAT_TYPE) param_list SEMICOLON { pin = 1 }
 
 // Statement is only used in handles.inc, and the parser only allows this incantation
 using_stmt ::= USING_KEYWORD '__intrinsics__' DOT 'Handle' SEMICOLON
@@ -184,7 +198,8 @@ methodmap ::= METHODMAP_KEYWORD symbol (LT symbol)? LBRACE methodmap_entry* RBRA
 private methodmap_entry ::= methodmap_method | methodmap_prop
 
 methodmap_method ::= methodmap_method_decl | methodmap_method_impl
-private methodmap_method_decl ::= PUBLIC_KEYWORD NATIVE_KEYWORD? type_expression symbol param_list SEMICOLON
+private methodmap_method_decl ::= PUBLIC_KEYWORD STATIC_KEYWORD? NATIVE_KEYWORD? methodmap_method_ident param_list SEMICOLON { pin = 7 }
+private methodmap_method_ident ::= type_expression symbol | symbol | TILDE symbol
 private methodmap_method_impl ::= PUBLIC_KEYWORD type_expression symbol param_list stmt
 
 methodmap_prop ::= PROPERTY_KEYWORD type_expression symbol LBRACE prop_decl* RBRACE { pin = 1 }
@@ -193,18 +208,25 @@ accessor_name ::= 'get' | 'set'
 private prop_method_decl ::= PUBLIC_KEYWORD NATIVE_KEYWORD? accessor_name param_list SEMICOLON
 private prop_method_impl ::= PUBLIC_KEYWORD accessor_name param_list stmt
 
+typedef ::= TYPEDEF_KEYWORD symbol EQ typedef_def { pin = 1 }
+typedef_def ::= FUNCTION_TYPE type_expression typedef_param_list SEMICOLON { pin = 1 }
+private typedef_param_list ::= LPAREN <<list_maybe_trailing_comma typedef_param_decl>>? RPAREN { pin = 1 }
+private typedef_param_decl ::= CONST_KEYWORD? type_expression AND? symbol old_dims?
+
+typeset ::= TYPESET_KEYWORD symbol LBRACE typedef_def+ RBRACE { pin = 1 }
+
+struct_decl ::= STRUCT_KEYWORD symbol LBRACE struct_field* RBRACE { pin = 1 }
+struct_field ::= PUBLIC_KEYWORD CONST_KEYWORD? type_expression symbol SEMICOLON
+
 func ::= func_storage_class? type_expression symbol param_list stmt
 private func_storage_class ::= PUBLIC_KEYWORD
                              | STOCK_KEYWORD STATIC_KEYWORD?
                              | STATIC_KEYWORD STOCK_KEYWORD?
 
 param_list ::= LPAREN <<list param_decl>>? RPAREN { pin = 1 }
-param_decl ::= param_decl_old | param_decl_new
-private param_decl_old ::= CONST_KEYWORD? tags AND? symbol old_dims? (EQ expr)?
-private param_decl_new ::= CONST_KEYWORD? type_expression AND? symbol old_dims? (EQ expr)?
-
-private meta stmt_of ::= <<param>> | <<compound_stmt_of <<param>> >>
-private meta compound_stmt_of ::= LBRACE <<param>>* RBRACE { pin = 1 }
+param_decl ::= param_decl_new | param_decl_old
+private param_decl_old ::= CONST_KEYWORD? tags? AND? symbol old_dims? (EQ expr)?
+private param_decl_new ::= CONST_KEYWORD? type_expression AND? ((symbol old_dims? (EQ expr)?) | ELLIPSIS)
 
 private stmt ::= compound_stmt
                | single_stmt
@@ -215,39 +237,39 @@ private single_stmt ::= simple_stmt
                       | for_loop
                       | while_loop
                       | do_while_loop
+                      | continue_stmt
+                      | break_stmt
                       | return_stmt
                       | enum_decl
-private compound_stmt ::= <<compound_stmt_of stmt>>
+private compound_stmt ::= LBRACE stmt* RBRACE { pin = 1 }
 
-private loop_stmt ::= <<stmt_of (single_stmt | continue_stmt | break_stmt)>>
-
-private simple_stmt ::= simple_expression SEMICOLON { pin = 2 }
+private simple_stmt ::= simple_expression SEMICOLON { pin = 1 }
 private simple_expression ::= local_decl | expr
 
-if_stmt ::= IF_KEYWORD LPAREN expr RPAREN stmt (ELSE_KEYWORD stmt)?
+if_stmt ::= IF_KEYWORD LPAREN expr RPAREN stmt (ELSE_KEYWORD stmt)? { pin = 1 }
 
-switch_stmt ::= SWITCH_KEYWORD LPAREN expr RPAREN LBRACE (switch_case | switch_default)* RBRACE
-switch_case ::= CASE_KEYWORD <<list expr>> COLON stmt
-switch_default ::= DEFAULT_KEYWORD COLON stmt
+switch_stmt ::= SWITCH_KEYWORD LPAREN expr RPAREN LBRACE (switch_case | switch_default)* RBRACE { pin = 1 }
+switch_case ::= CASE_KEYWORD <<list expr>> COLON stmt { pin = 1 }
+switch_default ::= DEFAULT_KEYWORD COLON stmt { pin = 1 }
 
-for_loop ::= FOR_KEYWORD LPAREN for_init? SEMICOLON for_condition? SEMICOLON for_iteration? RPAREN loop_stmt
+for_loop ::= FOR_KEYWORD LPAREN for_init? SEMICOLON for_condition? SEMICOLON for_iteration? RPAREN stmt { pin = 1 }
 private for_init ::= <<list simple_expression>>
 private for_condition ::= expr
 private for_iteration ::= expr
 
-while_loop ::= WHILE_KEYWORD LPAREN while_condition RPAREN stmt
+while_loop ::= WHILE_KEYWORD LPAREN while_condition RPAREN stmt { pin = 1 }
 private while_condition ::= expr
-do_while_loop ::= DO_KEYWORD stmt WHILE_KEYWORD LPAREN while_condition RPAREN SEMICOLON
+do_while_loop ::= DO_KEYWORD stmt WHILE_KEYWORD LPAREN while_condition RPAREN SEMICOLON { pin = 1 }
 
-continue_stmt ::= CONTINUE_KEYWORD SEMICOLON
-break_stmt ::= BREAK_KEYWORD SEMICOLON
+continue_stmt ::= CONTINUE_KEYWORD SEMICOLON { pin = 1 }
+break_stmt ::= BREAK_KEYWORD SEMICOLON { pin = 1 }
 
-return_stmt ::= RETURN_KEYWORD expr? SEMICOLON
+return_stmt ::= RETURN_KEYWORD expr? SEMICOLON { pin = 1 }
 
-enum_decl ::= ENUM_KEYWORD symbol LBRACE <<list enum_item>> COMMA? RBRACE { pin = 1 }
-enum_item ::= symbol (EQ integer)?
+enum_decl ::= ENUM_KEYWORD (tag | symbol)? LBRACE <<list_maybe_trailing_comma enum_item>>? RBRACE { pin = 1 }
+enum_item ::= symbol (EQ expr)?
 
-local_decl ::= (STATIC_KEYWORD | CONST_KEYWORD)? type_expression symbol old_dims? local_initializer?
+local_decl ::= (STATIC_KEYWORD | CONST_KEYWORD)? type_expression <<list (symbol old_dims? local_initializer?)>>
 private local_initializer ::= EQ expr { pin = 1 }
 
 expr ::= assignment_expr
@@ -265,13 +287,14 @@ expr ::= assignment_expr
        | unary_group
        | postfix_group
        | primary_expr
+       | paren_expr
        | literal
        { extraRoot = true }
 
 ternary_expr ::= expr QUEST expr COLON expr { pin = 2 }
 
-assignment_expr ::= symbol assignment_op expr {
-  pin = 2
+assignment_expr ::= primary_expr subscript? assignment_op expr {
+  pin = 3
   rightAssociative = true
 }
 
@@ -287,6 +310,11 @@ private assignment_op ::= EQ
                         | LTLTEQ
                         | GTGTEQ
 
+private relational_op ::= LT
+                        | GT
+                        | LE
+                        | GE
+
 private postfix_group ::= subscript_expr
                         | post_increment_expr
                         | post_decrement_expr
@@ -299,6 +327,7 @@ private unary_group ::= pre_increment_expr
                       | negative_expr
                       | not_expr
                       | logical_not_expr
+                      | sizeof_expr
                       | view_as_expr
                       | new_expr
                       | call_expr
@@ -309,7 +338,7 @@ inclusive_or_expr ::= expr XOR expr { pin = 2 }
 exclusive_or_expr ::= expr OR expr { pin = 2 }
 and_expr ::= expr AND expr { pin = 2 }
 equality_expr ::= expr (EQEQ | NE) expr { pin = 2 }
-relational_expr ::= expr (LT | GT | LTLTEQ | GTGTEQ) expr { pin = 2 }
+relational_expr ::= expr relational_op expr { pin = 2 }
 shift_expr ::= expr (LTLT | GTGT) expr { pin = 2 }
 additive_expr ::= expr (PLUS | MINUS) expr { pin = 2 }
 multiplicative_expr ::= expr (ASTERISK | DIV | PERC) expr { pin = 2 }
@@ -322,29 +351,33 @@ positive_expr ::= PLUS expr
 negative_expr ::= MINUS expr
 not_expr ::= TILDE expr
 logical_not_expr ::= EXCL expr
-view_as_expr ::= VIEW_AS_KEYWORD LT type_expression GT paren_expr
+sizeof_expr ::= SIZEOF_KEYWORD expr { pin = 1 }
+view_as_expr ::= VIEW_AS_KEYWORD LT type_expression GT paren_expr { pin = 1 }
 new_expr ::= NEW_KEYWORD (type def_dims | call_expr) { pin = 1 }
-call_expr ::= symbol LPAREN <<list call_arg>>? RPAREN { pin = 2 }
-call_arg ::= expr | DOT symbol EQ expr
+
+call_expr ::= (primary_expr | FLOAT_TYPE) LPAREN <<list call_arg>>? RPAREN { pin = 2 }
+call_arg ::= call_arg_value | DOT symbol EQ call_arg_value
+private call_arg_value ::= UNDERSCORE | expr
 
 post_increment_expr ::= expr PLUSPLUS { pin = 2 }
 post_decrement_expr ::= expr MINUSMINUS { pin = 2 }
-subscript_expr ::= expr LBRACKET expr RBRACKET { pin=2 }
+subscript_expr ::= expr subscript { pin = 2 }
+// XXX: lack of expression used for sizeof expr. is there a better way?
+private subscript ::= LBRACKET expr? RBRACKET { pin = 1 }
 
-primary_expr ::= symbol
-               | literal
-               | paren_expr
+primary_expr ::= symbol ((DOT) symbol)? subscript*
 
 paren_expr ::= LPAREN expr RPAREN { pin = 1 }
 
 literal ::= NULL_KEYWORD
+          | boolean
           | number
           | string_literal
           | character_literal
           | array_literal
           { extends = expr }
 
-array_literal ::= LBRACE <<list expr>> (COMMA ELLIPSIS)? RBRACE
+boolean ::= TRUE_KEYWORD | FALSE_KEYWORD
 
 number ::= integer
          | rational
@@ -356,3 +389,5 @@ integer ::= integer_literal
           | binary_literal
           | hex_literal
           { extends = expr }
+
+array_literal ::= LBRACE <<list expr>> (COMMA ELLIPSIS)? RBRACE
