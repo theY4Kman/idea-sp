@@ -1,5 +1,6 @@
 import org.jetbrains.grammarkit.tasks.GenerateLexer
 import org.jetbrains.grammarkit.tasks.GenerateParser
+import org.jetbrains.kotlin.gradle.dsl.KotlinJvmOptions
 
 
 plugins {
@@ -22,7 +23,7 @@ repositories {
 intellij {
     version = "2020.3.1"
 
-    setPlugins("PsiViewer:203-SNAPSHOT")
+    setPlugins("PsiViewer:203-SNAPSHOT", "com.jetbrains.hackathon.indices.viewer:1.12")
 }
 
 sourceSets.getByName("main") {
@@ -52,4 +53,10 @@ tasks.register<GenerateParser>("generateSourcePawnParser") {
     pathToPsiRoot = "/org/idea_sp/parser/psi"
     targetRoot = "src/main/gen"
     purgeOldFiles = true
+}
+
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
+    kotlinOptions {
+        jvmTarget = JavaVersion.VERSION_1_8.toString()
+    }
 }
