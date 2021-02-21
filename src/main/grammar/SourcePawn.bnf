@@ -1,4 +1,3 @@
-
 {
   parserClass="org.idea_sp.parser.SourcePawnParser"
 
@@ -143,6 +142,10 @@
     // TODO: remove me (for live preview purposes only)
     SPACE="regexp:[ \n\r\t\f]"
   ]
+
+  implements("global_var_decl|func_decl|methodmap|methodmap_method|methodmap_prop|typedef|typedef_param_decl|typeset|struct_decl|struct_field|enum_struct_decl|enum_struct_field|enum_struct_method|func|param_decl|enum_decl|enum_item|local_decl_item")="org.idea_sp.psi.SourcePawnNamedElement"
+  mixin("global_var_decl|func_decl|methodmap|methodmap_method|methodmap_prop|typedef|typedef_param_decl|typeset|struct_decl|struct_field|enum_struct_decl|enum_struct_field|enum_struct_method|func|param_decl|enum_decl|enum_item|local_decl_item")="org.idea_sp.psi.impl.SourcePawnNamedElementImpl"
+  generateTokenAccessors="no"
 }
 
 private root ::= global*
@@ -151,19 +154,20 @@ private meta list ::= <<param>> ( COMMA <<param>> )*
 private meta list_maybe_trailing_comma ::= <<list <<param>>>> COMMA?
 
 private global ::= global_var_decl_statement
-                 | enum_decl SEMICOLON? // XXX: pull out to rule?
                  | func_decl
                  | using_stmt
                  | methodmap
                  | typedef
                  | typeset SEMICOLON?
                  | struct_decl SEMICOLON?
+                 | enum_struct_decl SEMICOLON?
+                 | enum_decl SEMICOLON?
                  | func
 
 global_var_decl_statement ::= global_var_decl SEMICOLON
                             | global_var_decl EQ global_var_initializer SEMICOLON
 
-global_var_decl ::= global_var_storage_class? CONST_KEYWORD? type_expression symbol old_dims?
+global_var_decl ::= global_var_storage_class? CONST_KEYWORD? type_expression identifier old_dims?
 global_var_storage_class ::= STATIC_KEYWORD | PUBLIC_KEYWORD
 global_var_initializer ::= struct_literal | expr
 
@@ -186,47 +190,65 @@ private tag-vector ::= LBRACE <<list symbol>> RBRACE { pin = 1 }
 private tag ::= symbol COLON { pin = 2 }
 
 struct_literal ::= LBRACE <<list_maybe_trailing_comma struct_literal_item>> RBRACE
-struct_literal_item ::= symbol EQ expr { pin = 2 }  // XXX: be more restrictive?
+struct_literal_item ::= identifier EQ expr { pin = 2 }  // XXX: be more restrictive?
 
 // NOTE: "float" is only allowed in older versions of the compiler, where it is a native.
-func_decl ::= (NATIVE_KEYWORD | FORWARD_KEYWORD) type_expression (symbol | FLOAT_TYPE) param_list SEMICOLON { pin = 1 }
+func_decl ::= func_decl_type type_expression (identifier | FLOAT_TYPE) param_list SEMICOLON {
+  pin = 1
+  methods = [
+    funcType = "/func_decl_type"
+    nameIdentifier = "/identifier"
+  ]
+}
+func_decl_type ::= NATIVE_KEYWORD | FORWARD_KEYWORD
 
 // Statement is only used in handles.inc, and the parser only allows this incantation
 using_stmt ::= USING_KEYWORD '__intrinsics__' DOT 'Handle' SEMICOLON
 
-methodmap ::= METHODMAP_KEYWORD symbol (LT symbol)? LBRACE methodmap_entry* RBRACE SEMICOLON? { pin = 1 }
+methodmap ::= METHODMAP_KEYWORD identifier (LT identifier)? LBRACE methodmap_entry* RBRACE SEMICOLON? {
+  pin = 1
+  methods = [
+    nameIdentifier="/identifier[0]"
+    extendsType="/identifier[1]"
+  ]
+}
 private methodmap_entry ::= methodmap_method | methodmap_prop
 
 methodmap_method ::= methodmap_method_decl | methodmap_method_impl
 private methodmap_method_decl ::= PUBLIC_KEYWORD STATIC_KEYWORD? NATIVE_KEYWORD? methodmap_method_ident param_list SEMICOLON { pin = 7 }
-private methodmap_method_ident ::= type_expression symbol | symbol | TILDE symbol
-private methodmap_method_impl ::= PUBLIC_KEYWORD type_expression symbol param_list stmt
+private methodmap_method_ident ::= type_expression identifier | identifier | TILDE identifier
+private methodmap_method_impl ::= PUBLIC_KEYWORD type_expression identifier param_list stmt
 
-methodmap_prop ::= PROPERTY_KEYWORD type_expression symbol LBRACE prop_decl* RBRACE { pin = 1 }
+methodmap_prop ::= PROPERTY_KEYWORD type_expression identifier LBRACE prop_decl* RBRACE { pin = 1 }
 prop_decl ::= prop_method_decl | prop_method_impl
 accessor_name ::= 'get' | 'set'
 private prop_method_decl ::= PUBLIC_KEYWORD NATIVE_KEYWORD? accessor_name param_list SEMICOLON
 private prop_method_impl ::= PUBLIC_KEYWORD accessor_name param_list stmt
 
-typedef ::= TYPEDEF_KEYWORD symbol EQ typedef_def { pin = 1 }
+typedef ::= TYPEDEF_KEYWORD identifier EQ typedef_def { pin = 1 }
 typedef_def ::= FUNCTION_TYPE type_expression typedef_param_list SEMICOLON { pin = 1 }
 private typedef_param_list ::= LPAREN <<list_maybe_trailing_comma typedef_param_decl>>? RPAREN { pin = 1 }
-private typedef_param_decl ::= CONST_KEYWORD? type_expression AND? symbol old_dims?
+typedef_param_decl ::= CONST_KEYWORD? type_expression AND? identifier old_dims?{ pin = 1 }
 
-typeset ::= TYPESET_KEYWORD symbol LBRACE typedef_def+ RBRACE { pin = 1 }
+typeset ::= TYPESET_KEYWORD identifier LBRACE typedef_def+ RBRACE { pin = 1 }
 
-struct_decl ::= STRUCT_KEYWORD symbol LBRACE struct_field* RBRACE { pin = 1 }
-struct_field ::= PUBLIC_KEYWORD CONST_KEYWORD? type_expression symbol SEMICOLON
+struct_decl ::= STRUCT_KEYWORD identifier LBRACE struct_field* RBRACE { pin = 1 }
+struct_field ::= PUBLIC_KEYWORD CONST_KEYWORD? type_expression identifier SEMICOLON { pin = 1 }
 
-func ::= func_storage_class? type_expression symbol param_list stmt
+enum_struct_decl ::= ENUM_KEYWORD STRUCT_KEYWORD identifier LBRACE /* newline */ enum_struct_item* RBRACE
+private enum_struct_item ::= enum_struct_field | enum_struct_method
+enum_struct_field ::= type_expression identifier old_dims? SEMICOLON
+enum_struct_method ::= type_expression identifier param_list stmt SEMICOLON? { pin = 3 }
+
+func ::= func_storage_class? type_expression identifier param_list stmt
 private func_storage_class ::= PUBLIC_KEYWORD
                              | STOCK_KEYWORD STATIC_KEYWORD?
                              | STATIC_KEYWORD STOCK_KEYWORD?
 
 param_list ::= LPAREN <<list param_decl>>? RPAREN { pin = 1 }
 param_decl ::= param_decl_new | param_decl_old
-private param_decl_old ::= CONST_KEYWORD? tags? AND? symbol old_dims? (EQ expr)?
-private param_decl_new ::= CONST_KEYWORD? type_expression AND? ((symbol old_dims? (EQ expr)?) | ELLIPSIS)
+private param_decl_old ::= CONST_KEYWORD? tags? AND? identifier old_dims? (EQ expr)?
+private param_decl_new ::= CONST_KEYWORD? type_expression AND? ((identifier old_dims? (EQ expr)?) | ELLIPSIS)
 
 private stmt ::= compound_stmt
                | single_stmt
@@ -266,10 +288,11 @@ break_stmt ::= BREAK_KEYWORD SEMICOLON { pin = 1 }
 
 return_stmt ::= RETURN_KEYWORD expr? SEMICOLON { pin = 1 }
 
-enum_decl ::= ENUM_KEYWORD (tag | symbol)? LBRACE <<list_maybe_trailing_comma enum_item>>? RBRACE { pin = 1 }
-enum_item ::= symbol (EQ expr)?
+enum_decl ::= ENUM_KEYWORD (tag | identifier)? LBRACE <<list_maybe_trailing_comma enum_item>>? RBRACE { pin = 1 }
+enum_item ::= identifier (EQ expr)? { pin = 1 }
 
-local_decl ::= (STATIC_KEYWORD | CONST_KEYWORD)? type_expression <<list (symbol old_dims? local_initializer?)>>
+local_decl ::= (STATIC_KEYWORD | CONST_KEYWORD)? type_expression <<list local_decl_item>>
+local_decl_item ::= identifier old_dims? local_initializer? { pin = 1 }
 private local_initializer ::= EQ expr { pin = 1 }
 
 expr ::= assignment_expr
@@ -293,7 +316,7 @@ expr ::= assignment_expr
 
 ternary_expr ::= expr QUEST expr COLON expr { pin = 2 }
 
-assignment_expr ::= primary_expr subscript? assignment_op expr {
+assignment_expr ::= primary_expr assignment_op expr {
   pin = 3
   rightAssociative = true
 }
@@ -356,7 +379,8 @@ view_as_expr ::= VIEW_AS_KEYWORD LT type_expression GT paren_expr { pin = 1 }
 new_expr ::= NEW_KEYWORD (type def_dims | call_expr) { pin = 1 }
 
 call_expr ::= (primary_expr | FLOAT_TYPE) LPAREN <<list call_arg>>? RPAREN { pin = 2 }
-call_arg ::= call_arg_value | DOT symbol EQ call_arg_value
+call_arg ::= call_arg_value | call_kwarg
+call_kwarg ::= DOT identifier EQ call_arg_value
 private call_arg_value ::= UNDERSCORE | expr
 
 post_increment_expr ::= expr PLUSPLUS { pin = 2 }
@@ -365,7 +389,10 @@ subscript_expr ::= expr subscript { pin = 2 }
 // XXX: lack of expression used for sizeof expr. is there a better way?
 private subscript ::= LBRACKET expr? RBRACKET { pin = 1 }
 
-primary_expr ::= symbol ((DOT) symbol)? subscript*
+primary_expr ::= identifier subscript* (DOT primary_expr)*
+identifier ::= symbol {
+  mixin = "org.idea_sp.psi.ext.SourcePawnIdentifierMixin"
+}
 
 paren_expr ::= LPAREN expr RPAREN { pin = 1 }
 

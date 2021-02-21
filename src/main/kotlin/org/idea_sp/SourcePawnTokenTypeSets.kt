@@ -91,6 +91,14 @@ interface SourcePawnTokenTypeSets {
             SourcePawnTypes.LTLTEQ,
             SourcePawnTypes.GTGTEQ,
         )
+        val LITERALS = TokenSet.create(
+            SourcePawnTypes.INTEGER_LITERAL,
+            SourcePawnTypes.FLOAT_LITERAL,
+            SourcePawnTypes.HEX_LITERAL,
+            SourcePawnTypes.BINARY_LITERAL,
+            SourcePawnTypes.STRING_LITERAL,
+            SourcePawnTypes.CHARACTER_LITERAL,
+        )
         val STRINGS = TokenSet.create(
             SourcePawnTypes.STRING_LITERAL,
             SourcePawnTypes.CHARACTER_LITERAL,

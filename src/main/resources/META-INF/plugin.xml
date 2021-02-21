@@ -17,6 +17,8 @@
 <!--                  extensions="sp,inc" />-->
         <lang.parserDefinition language="SourcePawn"
                                implementationClass="org.idea_sp.SourcePawnParserDefinition"/>
+        <lang.findUsagesProvider language="SourcePawn"
+                                 implementationClass="org.idea_sp.SourcePawnFindUsagesProvider" />
 
         <!-- TODO: Replace syntaxHighlighterFactory with syntaxHighlighter -->
         <lang.syntaxHighlighterFactory language="SourcePawn"
