@@ -1,29 +1,32 @@
-import org.jetbrains.grammarkit.tasks.GenerateLexer
-import org.jetbrains.grammarkit.tasks.GenerateParser
-import org.jetbrains.kotlin.gradle.dsl.KotlinJvmOptions
+import org.jetbrains.grammarkit.tasks.GenerateLexerTask
+import org.jetbrains.grammarkit.tasks.GenerateParserTask
 
 
 plugins {
-    kotlin("jvm") version "1.4.10"
-    id("org.jetbrains.intellij") version "0.6.5"
-    id("org.jetbrains.grammarkit") version "2020.3.2"
+    kotlin("jvm") version "1.5.10"
+    id("org.jetbrains.intellij") version "1.0"
+    id("org.jetbrains.grammarkit") version "2021.2.2"
     java
     idea
 }
 
 
 group = "org.idea_sp"
-version = "0.1"
+version = "0.0.1"
 
 repositories {
     mavenCentral()
 }
 
+dependencies {
+    testImplementation(kotlin("test"))
+}
+
 // See https://github.com/JetBrains/gradle-intellij-plugin/
 intellij {
-    version = "2020.3.1"
+    version.set("2021.3.3")
 
-    setPlugins("PsiViewer:203-SNAPSHOT", "com.jetbrains.hackathon.indices.viewer:1.12")
+    plugins.set(listOf("PsiViewer:213-SNAPSHOT", "com.jetbrains.hackathon.indices.viewer:1.20"))
 }
 
 sourceSets.getByName("main") {
@@ -39,20 +42,19 @@ idea {
     }
 }
 
-
-tasks.register<GenerateLexer>("generateSourcePawnLexer") {
-    source = "src/main/grammar/SourcePawn.flex"
-    targetDir = "src/main/gen/org/idea_sp/"
-    targetClass = "_SourcePawnLexer"
-    purgeOldFiles = true
+tasks.register<GenerateLexerTask>("generateSourcePawnLexer") {
+    source.set("src/main/grammar/SourcePawn.flex")
+    targetDir.set("src/main/gen/org/idea_sp/")
+    targetClass.set("_SourcePawnLexer")
+    purgeOldFiles.set(true)
 }
 
-tasks.register<GenerateParser>("generateSourcePawnParser") {
-    source = "src/main/grammar/SourcePawn.bnf"
-    pathToParser = "/org/idea_sp/parser/SourcePawnParser.java"
-    pathToPsiRoot = "/org/idea_sp/parser/psi"
-    targetRoot = "src/main/gen"
-    purgeOldFiles = true
+tasks.register<GenerateParserTask>("generateSourcePawnParser") {
+    source.set("src/main/grammar/SourcePawn.bnf")
+    pathToParser.set("/org/idea_sp/parser/SourcePawnParser.java")
+    pathToPsiRoot.set("/org/idea_sp/parser/psi")
+    targetRoot.set("src/main/gen")
+    purgeOldFiles.set(true)
 }
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {

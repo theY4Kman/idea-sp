@@ -152,6 +152,7 @@ SYMBOL=([@_a-zA-Z][@_a-zA-Z0-9]+|[a-zA-Z][@_a-zA-Z0-9]*)
   "case"                       { return CASE_KEYWORD; }
   "continue"                   { return CONTINUE_KEYWORD; }
   "default"                    { return DEFAULT_KEYWORD; }
+  "delete"                     { return DELETE_KEYWORD; }
   "do"                         { return DO_KEYWORD; }
   "else"                       { return ELSE_KEYWORD; }
   "exit"                       { return EXIT_KEYWORD; }

@@ -4,7 +4,8 @@
   extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
   extends(".*_expr")=expr
 
-  consumeTokenMethod(".*_expr|expr")="consumeTokenFast"
+//XXX######################################################################################
+//  consumeTokenMethod(".*_expr|expr")="consumeTokenFast"
 
   psiClassPrefix="SourcePawn"
   psiImplClassSuffix="Impl"
@@ -88,7 +89,6 @@
     CONST_KEYWORD="const"
     FORWARD_KEYWORD="forward"
     NATIVE_KEYWORD="native"
-    NEW_KEYWORD="new"
     OPERATOR_KEYWORD="operator"
     PUBLIC_KEYWORD="public"
     STATIC_KEYWORD="static"
@@ -96,6 +96,7 @@
 
     DECL_KEYWORD="decl"
     NEW_KEYWORD="new"
+    DELETE_KEYWORD="delete"
     PUBLIC_KEYWORD="public"
 
     TRUE_KEYWORD="true"
@@ -166,12 +167,15 @@ private global ::= global_var_decl_statement
 
 global_var_decl_statement ::= global_var_decl SEMICOLON
                             | global_var_decl EQ global_var_initializer SEMICOLON
+                            | new_var_decl SEMICOLON
 
-global_var_decl ::= global_var_storage_class? CONST_KEYWORD? type_expression identifier old_dims?
+global_var_decl ::= global_var_storage_class? CONST_KEYWORD? (tags | type_expression) identifier old_dims?
 global_var_storage_class ::= STATIC_KEYWORD | PUBLIC_KEYWORD
 global_var_initializer ::= struct_literal | expr
 
-type_expression ::= type type_dims
+new_var_decl ::= NEW_KEYWORD tags? identifier old_dims?
+
+type_expression ::= type type_dims { pin = 1 }
 private type ::= (builtin_type | symbol)
 private type_dims ::= (LBRACKET RBRACKET)*
 private old_dims ::= (LBRACKET expr? RBRACKET)+
@@ -187,7 +191,7 @@ private builtin_type ::= ANY_TYPE
 
 tags ::= tag-vector | tag
 private tag-vector ::= LBRACE <<list symbol>> RBRACE { pin = 1 }
-private tag ::= symbol COLON { pin = 2 }
+private tag ::= (symbol | builtin_type) COLON { pin = "COLON" }
 
 struct_literal ::= LBRACE <<list_maybe_trailing_comma struct_literal_item>> RBRACE
 struct_literal_item ::= identifier EQ expr { pin = 2 }  // XXX: be more restrictive?
@@ -240,20 +244,24 @@ private enum_struct_item ::= enum_struct_field | enum_struct_method
 enum_struct_field ::= type_expression identifier old_dims? SEMICOLON
 enum_struct_method ::= type_expression identifier param_list stmt SEMICOLON? { pin = 3 }
 
-func ::= func_storage_class? type_expression identifier param_list stmt
+func ::= func_storage_class? func_type_ident param_list stmt
+private func_type_ident ::= func_type_ident_new | func_type_ident_old
+private func_type_ident_new ::= type_expression identifier
+private func_type_ident_old ::= tags? identifier
 private func_storage_class ::= PUBLIC_KEYWORD
                              | STOCK_KEYWORD STATIC_KEYWORD?
                              | STATIC_KEYWORD STOCK_KEYWORD?
 
 param_list ::= LPAREN <<list param_decl>>? RPAREN { pin = 1 }
 param_decl ::= param_decl_new | param_decl_old
-private param_decl_old ::= CONST_KEYWORD? tags? AND? identifier old_dims? (EQ expr)?
+private param_decl_old ::= CONST_KEYWORD? AND? tags? identifier old_dims? (EQ expr)?
 private param_decl_new ::= CONST_KEYWORD? type_expression AND? ((identifier old_dims? (EQ expr)?) | ELLIPSIS)
 
 private stmt ::= compound_stmt
                | single_stmt
 
 private single_stmt ::= simple_stmt
+                      | delete_stmt
                       | if_stmt
                       | switch_stmt
                       | for_loop
@@ -263,12 +271,16 @@ private single_stmt ::= simple_stmt
                       | break_stmt
                       | return_stmt
                       | enum_decl
-private compound_stmt ::= LBRACE stmt* RBRACE { pin = 1 }
+private compound_stmt ::= LBRACE stmt* RBRACE { pin = 1; }
 
 private simple_stmt ::= simple_expression SEMICOLON { pin = 1 }
-private simple_expression ::= local_decl | expr
+private simple_expression ::= local_decl | expr { recoverWhile = simple_expression_recover }
+private simple_expression_recover ::= !SEMICOLON
 
-if_stmt ::= IF_KEYWORD LPAREN expr RPAREN stmt (ELSE_KEYWORD stmt)? { pin = 1 }
+delete_stmt ::= DELETE_KEYWORD primary_expr SEMICOLON { pin = 1 }
+
+if_stmt ::= IF_KEYWORD if_cond stmt (ELSE_KEYWORD stmt)? { pin = 1 }
+private if_cond ::= LPAREN expr RPAREN { pin = 1 }
 
 switch_stmt ::= SWITCH_KEYWORD LPAREN expr RPAREN LBRACE (switch_case | switch_default)* RBRACE { pin = 1 }
 switch_case ::= CASE_KEYWORD <<list expr>> COLON stmt { pin = 1 }
@@ -291,7 +303,9 @@ return_stmt ::= RETURN_KEYWORD expr? SEMICOLON { pin = 1 }
 enum_decl ::= ENUM_KEYWORD (tag | identifier)? LBRACE <<list_maybe_trailing_comma enum_item>>? RBRACE { pin = 1 }
 enum_item ::= identifier (EQ expr)? { pin = 1 }
 
-local_decl ::= (STATIC_KEYWORD | CONST_KEYWORD)? type_expression <<list local_decl_item>>
+local_decl ::= local_decl_old | local_decl_new
+private local_decl_new ::= (STATIC_KEYWORD | CONST_KEYWORD)? type_expression <<list local_decl_item>>
+private local_decl_old ::= (NEW_KEYWORD | DECL_KEYWORD) tags? <<list local_decl_item>> { pin = 1 }
 local_decl_item ::= identifier old_dims? local_initializer? { pin = 1 }
 private local_initializer ::= EQ expr { pin = 1 }
 
@@ -314,29 +328,31 @@ expr ::= assignment_expr
        | literal
        { extraRoot = true }
 
-ternary_expr ::= expr QUEST expr COLON expr { pin = 2 }
+ternary_expr ::= expr QUEST expr COLON expr { pin = "QUEST" }
 
 assignment_expr ::= primary_expr assignment_op expr {
-  pin = 3
+  pin = 2
   rightAssociative = true
 }
 
-private assignment_op ::= EQ
-                        | PLUSEQ
-                        | MINUSEQ
-                        | ASTERISKEQ
-                        | DIVEQ
-                        | ANDEQ
-                        | OREQ
-                        | XOREQ
-                        | PERCEQ
-                        | LTLTEQ
-                        | GTGTEQ
+assignment_op ::= EQ
+                | PLUSEQ
+                | MINUSEQ
+                | ASTERISKEQ
+                | DIVEQ
+                | ANDEQ
+                | OREQ
+                | XOREQ
+                | PERCEQ
+                | LTLTEQ
+                | GTGTEQ
+                { name = "operator" }
 
-private relational_op ::= LT
-                        | GT
-                        | LE
-                        | GE
+relational_op ::= LT
+                | GT
+                | LE
+                | GE
+                { name = "operator" }
 
 private postfix_group ::= subscript_expr
                         | post_increment_expr
@@ -366,35 +382,44 @@ shift_expr ::= expr (LTLT | GTGT) expr { pin = 2 }
 additive_expr ::= expr (PLUS | MINUS) expr { pin = 2 }
 multiplicative_expr ::= expr (ASTERISK | DIV | PERC) expr { pin = 2 }
 
-pre_increment_expr ::= PLUSPLUS expr
-pre_decrement_expr ::= MINUSMINUS expr
-ref_expr ::= AND expr
-deref_expr ::= ASTERISK expr
-positive_expr ::= PLUS expr
-negative_expr ::= MINUS expr
-not_expr ::= TILDE expr
-logical_not_expr ::= EXCL expr
+pre_increment_expr ::= PLUSPLUS expr { pin = 1 }
+pre_decrement_expr ::= MINUSMINUS expr { pin = 1 }
+ref_expr ::= AND expr { pin = 1 }
+deref_expr ::= ASTERISK expr { pin = 1 }
+positive_expr ::= PLUS expr { pin = 1 }
+negative_expr ::= MINUS expr { pin = 1 }
+not_expr ::= TILDE expr { pin = 1 }
+logical_not_expr ::= EXCL expr { pin = 1 }
 sizeof_expr ::= SIZEOF_KEYWORD expr { pin = 1 }
 view_as_expr ::= VIEW_AS_KEYWORD LT type_expression GT paren_expr { pin = 1 }
 new_expr ::= NEW_KEYWORD (type def_dims | call_expr) { pin = 1 }
 
 call_expr ::= (primary_expr | FLOAT_TYPE) LPAREN <<list call_arg>>? RPAREN { pin = 2 }
 call_arg ::= call_arg_value | call_kwarg
-call_kwarg ::= DOT identifier EQ call_arg_value
+call_kwarg ::= DOT identifier EQ call_arg_value { pin = 1 }
 private call_arg_value ::= UNDERSCORE | expr
 
 post_increment_expr ::= expr PLUSPLUS { pin = 2 }
 post_decrement_expr ::= expr MINUSMINUS { pin = 2 }
-subscript_expr ::= expr subscript { pin = 2 }
+subscript_expr ::= expr subscript
 // XXX: lack of expression used for sizeof expr. is there a better way?
 private subscript ::= LBRACKET expr? RBRACKET { pin = 1 }
 
-primary_expr ::= identifier subscript* (DOT primary_expr)*
+primary_expr ::= identifier primary_expr_subscripts? primary_expr_prop? {
+//  recoverWhile = primary_expr_recover
+}
+private primary_expr_subscripts ::= subscript+
+private primary_expr_prop ::= (DOT primary_expr)+
 identifier ::= symbol {
   mixin = "org.idea_sp.psi.ext.SourcePawnIdentifierMixin"
 }
 
-paren_expr ::= LPAREN expr RPAREN { pin = 1 }
+// XXX: ugh, tag expressions really throw a wrench into case stmts.
+//      Does the compiler support tag exprs in cases?
+// NO! "expression with tag override must appear between parentheses"
+tag_expr ::= tag expr { pin = 1 }
+
+paren_expr ::= LPAREN (expr | tag_expr) RPAREN { pin = 1 }
 
 literal ::= NULL_KEYWORD
           | boolean

@@ -10,11 +10,9 @@
     <depends>com.intellij.modules.platform</depends>
 
     <extensions defaultExtensionNs="com.intellij">
-        <!-- TODO: Replace fileTypeFactory with fileType -->
-        <fileTypeFactory implementation="org.idea_sp.SourcePawnFileTypeFactory"/>
-<!--        <fileType name="SourcePawn file" language="SourcePawn"-->
-<!--                  implementationClass="org.idea_sp.SourcePawnFileType"-->
-<!--                  extensions="sp,inc" />-->
+        <fileType name="SourcePawn file" language="SourcePawn"
+                  implementationClass="org.idea_sp.SourcePawnFileType"
+                  extensions="sp;inc" />
         <lang.parserDefinition language="SourcePawn"
                                implementationClass="org.idea_sp.SourcePawnParserDefinition"/>
         <lang.findUsagesProvider language="SourcePawn"

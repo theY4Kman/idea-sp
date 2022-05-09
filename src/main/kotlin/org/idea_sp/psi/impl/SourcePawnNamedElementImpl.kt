@@ -27,7 +27,7 @@ abstract class SourcePawnNamedElementImpl(@NotNull node: ASTNode) : ASTWrapperPs
     override fun getDeclaringElement(): PsiElement = nameIdentifier ?: this
 
     @Suppress("UnstableApiUsage")
-    override fun getDeclarationRange(): TextRange
+    override fun getRangeInDeclaringElement(): TextRange
         = nameIdentifier?.textRangeInParent ?: TextRange.create(0, textLength)
 
     @Suppress("UnstableApiUsage")

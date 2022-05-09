@@ -52,9 +52,11 @@ class SourcePawnFindUsagesProvider : FindUsagesProvider {
 
     override fun getNodeText(element: PsiElement, useFullName: Boolean): String {
         if (element is SourcePawnLocalDeclItem) {
-            val decl = element.parentOfType<SourcePawnLocalDecl>()
-            val type = decl!!.typeExpression.text
-            return "$type ${element.identifier.text}"
+            val decl = element.parentOfType<SourcePawnLocalDecl>()!!
+            val prefix =
+                decl.typeExpression?.let { type -> "${type.text} " }
+                    ?: decl.tags?.text
+            return "${prefix}${element.identifier.text}"
         }
         return element.text
     }

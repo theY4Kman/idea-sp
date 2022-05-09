@@ -5,5 +5,5 @@ import org.idea_sp.SourcePawnLanguage
 import org.jetbrains.annotations.NonNls
 
 class SourcePawnTokenType(@NonNls debugName: String) : IElementType(debugName, SourcePawnLanguage) {
-    override fun toString(): String = "SourcePawnTokenType." + super.toString()
+    override fun toString(): String = "SP(${super.toString()})"
 }
